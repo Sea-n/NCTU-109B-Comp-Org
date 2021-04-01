@@ -5,7 +5,7 @@ module Half_Adder(
     );
     input In_A, In_B;
     output Sum, Carry_out;
-    
+
     // implement half adder circuit, your code starts from here.
 	// gate(output, input1, input2)
     xor(Sum, In_A, In_B);

@@ -39,7 +39,7 @@ reg  [8-1:0] mem_zcv    [0:(PATTERN_NUMBER-1)];
 reg  [6-1:0] pattern_count;
 reg          start_check;
 reg  [6-1:0] error_count;
-reg  [6-1:0] error_count_tmp; 
+reg  [6-1:0] error_count_tmp;
 
 wire [32-1:0] result_out;
 wire          zero_out;
@@ -70,13 +70,13 @@ initial begin
     error_count = 6'd0;
     error_count_tmp = 6'd0;
     pattern_count = 6'd0;
-    
+
     $readmemh("src1.txt", mem_src1);
     $readmemh("src2.txt", mem_src2);
     $readmemh("op.txt", mem_opcode);
     $readmemh("result.txt", mem_result);
     $readmemh("zcv.txt", mem_zcv);
-    
+
     #100 rst_n = 1'b1;
     #15 start_check = 1'd1;
 end
@@ -127,9 +127,9 @@ always@(negedge clk) begin
 				end
 			end
 			else begin
-			   $display("***************************************************");    
+			   $display("***************************************************");
 			   case(mem_opcode[pattern_count-2])
-				4'd0:$display(" AND error! ");                  
+				4'd0:$display(" AND error! ");
 				4'd1:$display(" OR error! ");
 				4'd2:$display(" ADD error! ");
 				4'd6:$display(" SUB error! ");
@@ -141,7 +141,7 @@ always@(negedge clk) begin
 			   $display(" No.%2d error!",pattern_count-1);
             $display(" Currect result: %h     Currect ZCV: %b",result_correct, zcv_correct[3-1:0]);
             $display(" Your result: %h     Your ZCV: %b\n",result_out, zcv_out);
-				$display("***************************************************");    
+				$display("***************************************************");
 				error_count <= error_count + 6'd1;
 			end
 	end

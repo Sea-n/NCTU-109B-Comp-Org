@@ -1,22 +1,22 @@
 `timescale 1ns/1ps
 
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date:    10:58:01 10/10/2013
-// Design Name: 
-// Module Name:    alu_top 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+// Design Name:
+// Module Name:    alu_top
+// Project Name:
+// Target Devices:
+// Tool versions:
+// Description:
 //
-// Dependencies: 
+// Dependencies:
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 

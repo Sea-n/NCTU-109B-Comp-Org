@@ -48,7 +48,7 @@ reg             zero;
 reg             cout;
 reg             overflow;
 
-always@( posedge clk or negedge rst_n ) 
+always@( posedge clk or negedge rst_n )
 begin
 	if(!rst_n) begin
 

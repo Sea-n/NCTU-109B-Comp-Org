@@ -21,15 +21,15 @@ initial begin // Stimulus patterns
     correct = 1;
     ans_sum     = 8'b01101001;
     ans_carry   = 8'b00010111;
-    
+
     #10 a = 0; b = 0; cin = 0; // Statements execute in sequence
     #10 a = 0; b = 1; cin = 0;
     #10 a = 1; b = 0; cin = 0;
     #10 a = 1; b = 1; cin = 0;
     #10 a = 0; b = 0; cin = 1;
-    #10 a = 0; b = 1; cin = 1; 
-    #10 a = 1; b = 0; cin = 1; 
-    #10 a = 1; b = 1; cin = 1; 
+    #10 a = 0; b = 1; cin = 1;
+    #10 a = 1; b = 0; cin = 1;
+    #10 a = 1; b = 1; cin = 1;
 end
 
 always #5 clk = ~clk;
