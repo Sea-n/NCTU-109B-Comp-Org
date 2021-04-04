@@ -25,7 +25,8 @@ input [2-1:0] operation;
 output        result;
 output        cout;
 
-reg           result, cout;
+reg           result;
+reg           cout;
 
 wire          src1, src2;
 wire          as, ac;
@@ -37,23 +38,13 @@ fa fad(.A(src1), .B(src2), .Cin(cin), .S(as), .Cout(ac));
 // Intentionally use blocking assignment instead of non-blocking one
 always @(posedge clk) begin
 	case (operation)
-		2'b00: begin
-			result = src1 & src2;
-			cout = 0;
-		end
-		2'b01: begin
-			result = src1 | src2;
-			cout = 0;
-		end
-		2'b10: begin
-			result = as;
-			cout = ac;
-		end
-		2'b11: begin
-			result = 1;
-			cout = 0;
-		end
+		2'b00: result = src1 & src2;
+		2'b01: result = src1 | src2;
+		2'b10: result = as;
+		2'b11: result = 1;
 	endcase
+
+	cout = (operation == 2'b10) ? ac : 1'b0;
 end
 
 endmodule

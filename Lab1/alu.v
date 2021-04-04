@@ -27,7 +27,6 @@ output          overflow;
 
 reg    [32-1:0] result;
 reg             zero;
-reg             cout;
 reg             overflow;
 
 reg Ai, Bi, cin;
@@ -38,10 +37,12 @@ wire [31:0] res, c_out;
 genvar i;
 	alu_top u0(.clk(clk), .src1_in(src1[0]), .src2_in(src2[0]), .less(less[0]), .A_invert(Ai),
 .B_invert(Bi), .cin(1'b0), .operation(op), .result(res[0]), .cout(c_out[0]));
-generate for (i=1; i<32; i=i+1)
-	alu_top u0(.clk(clk), .src1_in(src1[i]), .src2_in(src2[i]), .less(less[i]), .A_invert(Ai),
+generate for (i=1; i<31; i=i+1)
+	alu_top u1(.clk(clk), .src1_in(src1[i]), .src2_in(src2[i]), .less(less[i]), .A_invert(Ai),
 .B_invert(Bi), .cin(c_out[i-1]), .operation(op), .result(res[i]), .cout(c_out[i]));
 endgenerate
+	alu_top u31(.clk(clk), .src1_in(src1[31]), .src2_in(src2[31]), .less(less[31]), .A_invert(Ai),
+.B_invert(Bi), .cin(c_out[30]), .operation(op), .result(res[31]), .cout(cout));
 
 // Since the checker evaluate answer in 0.5 clock after input, we should use
 // blocking assignment (var = 0) instead of non-blocking one (var <= 0)
@@ -57,28 +58,24 @@ always @(posedge clk or negedge rst_n) begin
 				op = 2'b00;
 				Ai = 1'b0;
 				Bi = 1'b0;
-				cout = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0001: begin  // OR
 				op = 2'b01;
 				Ai = 1'b0;
 				Bi = 1'b0;
-				cout = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0010: begin  // ADD
 				op = 2'b10;
 				Ai = 1'b0;
 				Bi = 1'b0;
-				cout = c_out[31];
 				overflow = 1'b0;
 			end
 			4'b1100: begin  // NOR
 				op = 2'b01;
 				Ai = 1'b0;
 				Bi = 1'b0;
-				cout = 1'b0;
 				overflow = 1'b0;
 			end
 			default: begin

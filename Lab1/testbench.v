@@ -41,6 +41,9 @@ assign result_correct = {mem_result[4*(pattern_count-5'd2) + 5'd3],
 assign zcv_correct = mem_zcv[pattern_count-5'd2];
 
 initial begin
+	$dumpfile("debug.vcd");
+	$dumpvars;
+
 	clk   = 1'b0;
 	rst_n = 1'b0;
 	src1_in = 32'd0;
