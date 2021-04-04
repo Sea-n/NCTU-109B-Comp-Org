@@ -46,51 +46,35 @@ endgenerate
 // Since the checker evaluate answer in 0.5 clock after input, we should use
 // blocking assignment (var = 0) instead of non-blocking one (var <= 0)
 
-always @(ALU_control)
+always @(ALU_control) begin
 	op = {ALU_control[1], ALU_control[3] | ALU_control[0]};
+	Ai = 1'b0;
+	Bi = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
+	cin = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
+end
 
+// TODO: SLT, handle overflow, edge cases
 always @(posedge clk or negedge rst_n) begin
 	if (!rst_n) begin
-		Ai = 1'b0;
-		Bi = 1'b0;
-		cin = 1'b0;
 		less = 32'b0;
 	end else begin
 		case (ALU_control)
 			4'b0000: begin  // AND
-				Ai = 1'b0;
-				Bi = 1'b0;
-				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0001: begin  // OR
-				Ai = 1'b0;
-				Bi = 1'b0;
-				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0010: begin  // ADD
-				Ai = 1'b0;
-				Bi = 1'b0;
-				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0110: begin  // SUB
-				Ai = 1'b0;
-				Bi = 1'b1;
-				cin = 1'b1;
 				overflow = 1'b0;
 			end
 			4'b0111: begin  // SLT
-				Ai = 1'b0;
-				Bi = 1'b0;
-				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b1100: begin  // NOR
-				Ai = 1'b0;
-				Bi = 1'b0;
-				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			default: begin

@@ -36,7 +36,7 @@ assign src2 = src2_in ^ B_invert;
 fa fad(.A(src1), .B(src2), .Cin(cin), .S(as), .Cout(ac));
 
 // Intentionally use blocking assignment instead of non-blocking one
-always @(*) begin
+always @(operation, src1, src2, as) begin
 	case (operation)
 		2'b00: result = src1 & src2;
 		2'b01: result = src1 | src2;
