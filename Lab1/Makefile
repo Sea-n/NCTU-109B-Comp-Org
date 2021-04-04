@@ -1,3 +1,3 @@
 all:
-	iverilog -o alu alu_top.v alu.v testbench.v
+	iverilog -o alu ha.v fa.v alu_top.v alu.v testbench.v
 	./alu

@@ -81,7 +81,7 @@ always @(posedge clk) begin
 			$display(" Congratulation! All data are correct! ");
 			$display("***************************************************");
 		end
-		$stop;
+		$finish;
 	end
 	else if (rst_n) begin
 		src1_in       <= {mem_src1[4*pattern_count + 6'd3],
@@ -118,8 +118,8 @@ always @(negedge clk) begin
 					end
 				endcase
 				$display(" No.%2d error!", pattern_count-1);
-				$display(" Currect result: %h     Currect ZCV: %b", result_correct, zcv_correct[3-1:0]);
-				$display(" Your result: %h     Your ZCV: %b\n", result_out, zcv_out);
+				$display(" Correct result: %h     Correct ZCV: %b", result_correct, zcv_correct[3-1:0]);
+				$display("   Your  result: %h       Your  ZCV: %b\n", result_out, zcv_out);
 				$display("***************************************************");
 				error_count <= error_count + 6'd1;
 			end

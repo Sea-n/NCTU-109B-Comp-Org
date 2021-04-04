@@ -30,48 +30,70 @@ reg             zero;
 reg             cout;
 reg             overflow;
 
-reg Ai, Bi;
+reg Ai, Bi, cin;
 reg [1:0] op;
-reg [31:0] less, cin;
+reg [31:0] less;
 wire [31:0] res, c_out;
 
 genvar i;
-generate for (i=0; i<32; i=i+1)
-	alu_top u0(src1[i], src2[i], less[i], Ai, Bi, cin[i], op, res[i], c_out[i]);
+	alu_top u0(.clk(clk), .src1_in(src1[0]), .src2_in(src2[0]), .less(less[0]), .A_invert(Ai),
+.B_invert(Bi), .cin(1'b0), .operation(op), .result(res[0]), .cout(c_out[0]));
+generate for (i=1; i<32; i=i+1)
+	alu_top u0(.clk(clk), .src1_in(src1[i]), .src2_in(src2[i]), .less(less[i]), .A_invert(Ai),
+.B_invert(Bi), .cin(c_out[i-1]), .operation(op), .result(res[i]), .cout(c_out[i]));
 endgenerate
 
+// Since the checker evaluate answer in 0.5 clock after input, we should use
+// blocking assignment (var = 0) instead of non-blocking one (var <= 0)
 always @(posedge clk or negedge rst_n) begin
 	if (!rst_n) begin
-		Ai <= 0;
-		Bi <= 0;
-		op <= 2'b00;
-		cin <= 32'b0;
-		less <= 32'b0;
+		Ai = 1'b0;
+		Bi = 1'b0;
+		op = 2'b00;
+		less = 32'b0;
 	end else begin
-		zero <= ~(|res);
-		result <= res;
-
 		case (ALU_control)
-			4'b0000: begin
-				op <= 2'b00;
-				Ai <= 0;
-				Bi <= 0;
-				cout <= 0;
-				overflow <= 0;
+			4'b0000: begin  // AND
+				op = 2'b00;
+				Ai = 1'b0;
+				Bi = 1'b0;
+				cout = 1'b0;
+				overflow = 1'b0;
 			end
-			4'b0001: begin
-				op <= 2'b01;
-				Ai <= 0;
-				Bi <= 0;
-				cout <= 0;
-				overflow <= 0;
+			4'b0001: begin  // OR
+				op = 2'b01;
+				Ai = 1'b0;
+				Bi = 1'b0;
+				cout = 1'b0;
+				overflow = 1'b0;
+			end
+			4'b0010: begin  // ADD
+				op = 2'b10;
+				Ai = 1'b0;
+				Bi = 1'b0;
+				cout = c_out[31];
+				overflow = 1'b0;
+			end
+			4'b1100: begin  // NOR
+				op = 2'b01;
+				Ai = 1'b0;
+				Bi = 1'b0;
+				cout = 1'b0;
+				overflow = 1'b0;
 			end
 			default: begin
-				overflow <= 1;
+				overflow = 1'b1;
 			end
 		endcase
-
 	end
+end
+
+always @(res) begin
+	if (ALU_control == 4'b1100)
+		result = ~res;
+	else
+		result = res;
+	zero = ~(|result);
 end
 
 endmodule
