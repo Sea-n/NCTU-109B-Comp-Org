@@ -36,15 +36,16 @@ assign src2 = src2_in ^ B_invert;
 fa fad(.A(src1), .B(src2), .Cin(cin), .S(as), .Cout(ac));
 
 // Intentionally use blocking assignment instead of non-blocking one
-always @(posedge clk) begin
+always @(*) begin
 	case (operation)
 		2'b00: result = src1 & src2;
 		2'b01: result = src1 | src2;
 		2'b10: result = as;
 		2'b11: result = 1;
 	endcase
-
-	cout = (operation == 2'b10) ? ac : 1'b0;
 end
+
+always @(operation, ac)
+	cout = (operation == 2'b10) ? ac : 1'b0;
 
 endmodule

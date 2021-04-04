@@ -27,55 +27,70 @@ output          overflow;
 
 reg    [32-1:0] result;
 reg             zero;
+reg             cout;
 reg             overflow;
 
 reg Ai, Bi, cin;
 reg [1:0] op;
 reg [31:0] less;
-wire [31:0] res, c_out;
+wire [31:0] res, carry;
 
 genvar i;
 	alu_top u0(.clk(clk), .src1_in(src1[0]), .src2_in(src2[0]), .less(less[0]), .A_invert(Ai),
-.B_invert(Bi), .cin(1'b0), .operation(op), .result(res[0]), .cout(c_out[0]));
-generate for (i=1; i<31; i=i+1)
+.B_invert(Bi), .cin(cin), .operation(op), .result(res[0]), .cout(carry[0]));
+generate for (i=1; i<32; i=i+1)
 	alu_top u1(.clk(clk), .src1_in(src1[i]), .src2_in(src2[i]), .less(less[i]), .A_invert(Ai),
-.B_invert(Bi), .cin(c_out[i-1]), .operation(op), .result(res[i]), .cout(c_out[i]));
+.B_invert(Bi), .cin(carry[i-1]), .operation(op), .result(res[i]), .cout(carry[i]));
 endgenerate
-	alu_top u31(.clk(clk), .src1_in(src1[31]), .src2_in(src2[31]), .less(less[31]), .A_invert(Ai),
-.B_invert(Bi), .cin(c_out[30]), .operation(op), .result(res[31]), .cout(cout));
 
 // Since the checker evaluate answer in 0.5 clock after input, we should use
 // blocking assignment (var = 0) instead of non-blocking one (var <= 0)
+
+always @(ALU_control)
+	op = {ALU_control[1], ALU_control[3] | ALU_control[0]};
+
 always @(posedge clk or negedge rst_n) begin
 	if (!rst_n) begin
 		Ai = 1'b0;
 		Bi = 1'b0;
-		op = 2'b00;
+		cin = 1'b0;
 		less = 32'b0;
 	end else begin
 		case (ALU_control)
 			4'b0000: begin  // AND
-				op = 2'b00;
 				Ai = 1'b0;
 				Bi = 1'b0;
+				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0001: begin  // OR
-				op = 2'b01;
 				Ai = 1'b0;
 				Bi = 1'b0;
+				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b0010: begin  // ADD
-				op = 2'b10;
 				Ai = 1'b0;
 				Bi = 1'b0;
+				cin = 1'b0;
+				overflow = 1'b0;
+			end
+			4'b0110: begin  // SUB
+				Ai = 1'b0;
+				Bi = 1'b1;
+				cin = 1'b1;
+				overflow = 1'b0;
+			end
+			4'b0111: begin  // SLT
+				Ai = 1'b0;
+				Bi = 1'b0;
+				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			4'b1100: begin  // NOR
-				op = 2'b01;
 				Ai = 1'b0;
 				Bi = 1'b0;
+				cin = 1'b0;
 				overflow = 1'b0;
 			end
 			default: begin
@@ -85,12 +100,16 @@ always @(posedge clk or negedge rst_n) begin
 	end
 end
 
-always @(res) begin
-	if (ALU_control == 4'b1100)
-		result = ~res;
-	else
-		result = res;
-	zero = ~(|result);
+always @(posedge clk) begin
+	if (ALU_control == 4'b1100) begin
+		result <= ~res;
+		zero <= |res;
+	end else begin
+		result <= res;
+		zero <= ~(|res);
+	end
+
+	cout <= carry[31];
 end
 
 endmodule

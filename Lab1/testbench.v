@@ -2,7 +2,7 @@
 
 module testbench;
 
-parameter PATTERN_NUMBER = 6'd6;
+parameter PATTERN_NUMBER = 6'd24;
 
 reg          clk;
 reg          rst_n;
