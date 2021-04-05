@@ -1,5 +1,7 @@
 `timescale 1ns/1ps
 
+// Author: 0816146 韋詠祥
+
 module alu_top(
 	clk,
 	src1_in,       //1 bit source 1 (input)

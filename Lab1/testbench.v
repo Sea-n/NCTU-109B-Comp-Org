@@ -1,5 +1,7 @@
 `timescale 1ns/1ps
 
+// Author: 0816146 韋詠祥
+
 module testbench;
 
 parameter PATTERN_NUMBER = 6'd62;
