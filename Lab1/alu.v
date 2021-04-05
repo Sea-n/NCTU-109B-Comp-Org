@@ -43,17 +43,14 @@ generate for (i=1; i<32; i=i+1)
 .B_invert(Bi), .cin(carry[i-1]), .operation(op), .result(res[i]), .cout(carry[i]));
 endgenerate
 
-// Since the checker evaluate answer in 0.5 clock after input, we should use
-// blocking assignment (var = 0) instead of non-blocking one (var <= 0)
-
 always @(ALU_control) begin
 	op = {ALU_control[1], ALU_control[3] | ALU_control[0]};
 	Ai = 1'b0;
-	Bi = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
+	Bi = (ALU_control[3:1] == 3'b011) ? 1'b1 : 1'b0;
 	cin = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
 end
 
-// TODO: SLT, handle overflow, edge cases
+// TODO: handle overflow, edge cases
 always @(posedge clk or negedge rst_n) begin
 	if (!rst_n) begin
 		less = 32'b0;
@@ -85,15 +82,24 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 always @(posedge clk) begin
-	if (ALU_control == 4'b1100) begin
-		result <= ~res;
-		zero <= |res;
-	end else begin
-		result <= res;
-		zero <= ~(|res);
-	end
+	if (ALU_control == 4'b0111)  // SLT
+		cout <= 1'b0;
+	else
+		cout <= carry[31];
+end
 
-	cout <= carry[31];
+always @(posedge clk) begin
+	if (ALU_control == 4'b0111) begin  // SLT
+		result[31:1] <= 31'b0;
+		result[0] <= (src1[31] ^ src2[31]) ? src1[31] : carry[31];
+	end else if (ALU_control == 4'b1100)  // NOR
+		result <= ~res;
+	else
+		result <= res;
+end
+
+always @(result) begin
+	zero = ~|result;
 end
 
 endmodule
