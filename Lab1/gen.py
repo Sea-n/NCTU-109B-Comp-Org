@@ -33,8 +33,26 @@ def main():
         if op == 0b0010:  # ADD
             res = src1 + src2
 
+            if src1 & 0x80000000:
+                if src2 & 0x80000000:
+                    if not res & 0x80000000:
+                        zcv |= 0b010
+            else:
+                if not src2 & 0x80000000:
+                    if res & 0x80000000:
+                        zcv |= 0b010
+
         if op == 0b0110:  # SUB
-            res = src1 + ((~src2 + 1) & 0xFFFFFFFF)
+            res = src1 - src2
+
+            if src1 & 0x80000000:
+                if not src2 & 0x80000000:
+                    if not res & 0x80000000:
+                        zcv |= 0b010
+            else:
+                if src2 & 0x80000000:
+                    if res & 0x80000000:
+                        zcv |= 0b010
 
         if op == 0b1100:  # NOR
             res = ~(src1 | src2) & 0xFFFFFFFF
@@ -42,14 +60,13 @@ def main():
         if op == 0b0111:  # SLT
             res = 1 if int32(src1) < int32(src2) else 0
 
-        if res & 0x200000000:
-            zcv |= 0b001
-
         if res & 0x100000000:
-            zcv |= 0b010
+            zcv |= 0b001
 
         if res == 0:
             zcv |= 0b100
+
+        res &= 0xFFFFFFFF
 
         src1 = ('00000000' + hex(src1)[2:])[-8:]
         src2 = ('00000000' + hex(src2)[2:])[-8:]

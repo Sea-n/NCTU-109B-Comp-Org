@@ -4,36 +4,27 @@
 
 module alu_top(
 	clk,
-	src1_in,       //1 bit source 1 (input)
-	src2_in,       //1 bit source 2 (input)
-	less,       //1 bit less     (input)
-	A_invert,   //1 bit A_invert (input)
-	B_invert,   //1 bit B_invert (input)
+	src1_in,    //1 bit source 1 (input)
+	src2_in,    //1 bit source 2 (input)
+	Ai,         //1 bit A_invert (input)
+	Bi,         //1 bit B_invert (input)
 	cin,        //1 bit carry in (input)
 	operation,  //operation      (input)
 	result,     //1 bit result   (output)
-	cout       //1 bit carry out(output)
+	cout        //1 bit carry out(output)
 );
 
-input         clk;
-input         src1_in;
-input         src2_in;
-input         less;
-input         A_invert;
-input         B_invert;
-input         cin;
+input clk;
+input src1_in, src2_in;
+input Ai, Bi, cin;
 input [2-1:0] operation;
 
-output        result;
-output        cout;
+output reg result, cout;
 
-reg           result;
-reg           cout;
-
-wire          src1, src2;
-wire          as, ac;
-assign src1 = src1_in ^ A_invert;
-assign src2 = src2_in ^ B_invert;
+wire src1, src2;
+wire as, ac;
+assign src1 = src1_in ^ Ai;
+assign src2 = src2_in ^ Bi;
 
 fa fad(.A(src1), .B(src2), .Cin(cin), .S(as), .Cout(ac));
 
@@ -47,7 +38,8 @@ always @(operation, src1, src2, as) begin
 	endcase
 end
 
-always @(operation, ac)
+always @(operation, ac) begin
 	cout = (operation[1] == 1'b1) ? ac : 1'b0;
+end
 
 endmodule
