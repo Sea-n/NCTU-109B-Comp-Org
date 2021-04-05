@@ -91,7 +91,7 @@ end
 always @(posedge clk) begin
 	if (ALU_control == 4'b0111) begin  // SLT
 		result[31:1] <= 31'b0;
-		result[0] <= (src1[31] ^ src2[31]) ? src1[31] : carry[31];
+		result[0] <= (src1[31] ^ src2[31]) ? src1[31] : ~carry[31];
 	end else if (ALU_control == 4'b1100)  // NOR
 		result <= ~res;
 	else

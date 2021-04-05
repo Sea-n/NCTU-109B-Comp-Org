@@ -41,11 +41,11 @@ always @(operation, src1, src2, as) begin
 		2'b00: result = src1 & src2;
 		2'b01: result = src1 | src2;
 		2'b10: result = as;
-		2'b11: result = 1;
+		2'b11: result = as;
 	endcase
 end
 
 always @(operation, ac)
-	cout = (operation == 2'b10) ? ac : 1'b0;
+	cout = (operation[1] == 1'b1) ? ac : 1'b0;
 
 endmodule
