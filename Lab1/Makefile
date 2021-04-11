@@ -8,4 +8,4 @@ run:
 	./alu
 
 pack:
-	7z a 0816146.zip ha.v fa.v alu_top.v alu.v testbench.v
+	7z a 0816146.zip ha.v fa.v alu_top.v alu.v testbench.v report.pdf

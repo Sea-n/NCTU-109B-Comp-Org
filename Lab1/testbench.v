@@ -85,6 +85,10 @@ always @(posedge clk) begin
 			$display("***************************************************");
 			$display(" Congratulation! All data are correct! ");
 			$display("***************************************************");
+		end else begin
+			$display("###################################################");
+			$display(" Total %d errors ", error_count);
+			$display("###################################################");
 		end
 		$finish;
 	end
