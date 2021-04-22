@@ -22,8 +22,8 @@ output reg [31:0] result;
 output reg cout, overflow;
 output zero;
 
-reg Ai, Bi, cin;
-reg [1:0] op;
+wire Ai, Bi, cin;
+wire [1:0] op;
 wire [31:0] res, carry;
 
 /* Connecting submodule */
@@ -36,12 +36,10 @@ generate for (i=1; i<32; i=i+1)
 endgenerate
 
 /* Set corresponding opcode for 1-bit ALU */
-always @(ALU_control) begin
-	Ai = ALU_control[3];
-	Bi = ALU_control[2];
-	op = ALU_control[1:0];
-	cin = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
-end
+assign Ai = ALU_control[3];
+assign Bi = ALU_control[2];
+assign op = ALU_control[1:0];
+assign cin = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
 
 /* Aggregating results of 1-bit ALUs */
 always @(posedge clk, negedge rst_n) begin
