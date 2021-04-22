@@ -37,9 +37,9 @@ endgenerate
 
 /* Set corresponding opcode for 1-bit ALU */
 always @(ALU_control) begin
-	op = {ALU_control[1], ALU_control[3] | ALU_control[0]};
-	Ai = 1'b0;
-	Bi = (ALU_control[3:1] == 3'b011) ? 1'b1 : 1'b0;
+	Ai = ALU_control[3];
+	Bi = ALU_control[2];
+	op = ALU_control[1:0];
 	cin = (ALU_control == 4'b0110) ? 1'b1 : 1'b0;
 end
 
@@ -52,7 +52,7 @@ always @(posedge clk, negedge rst_n) begin
 			result[31:1] <= 31'b0;
 			result[0] <= (src1[31] ^ src2[31]) ? src1[31] : ~carry[31];
 		end else
-			result <= (ALU_control == 4'b1100) ? ~res : res;  // NOR
+			result <= res;
 	end
 end
 
