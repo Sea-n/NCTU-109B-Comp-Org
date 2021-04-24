@@ -13,8 +13,9 @@ input [32-1:0] src1_i;
 input [32-1:0] src2_i;
 output [32-1:0] sum_o;
 
-// Parameter
-
 // Main function
+always @(src1_i, src2_i) begin
+	sum_o <= src1_i + src2_i;
+end
 
 endmodule

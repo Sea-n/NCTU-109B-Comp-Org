@@ -12,5 +12,8 @@ input [32-1:0] data_i;
 output [32-1:0] data_o;
 
 // shift left 2
+always @(data_i) begin
+	data_o <= {data_i[29:0], 2'b0};
+end
 
 endmodule
