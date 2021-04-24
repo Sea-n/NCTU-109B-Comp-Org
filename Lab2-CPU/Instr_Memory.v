@@ -15,8 +15,6 @@ output reg [32-1:0] instr_o;
 // 32 words Memory
 reg [32-1:0] Instr_Mem [0:13-1];
 
-// Parameter
-
 // Main function
 always @(pc_addr_i) begin
 	instr_o = Instr_Mem[pc_addr_i/4];

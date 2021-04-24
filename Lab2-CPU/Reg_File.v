@@ -20,7 +20,7 @@ input [5-1:0] RSaddr_i, RTaddr_i, RDaddr_i;
 input [32-1:0] RDdata_i;
 output [32-1:0] RSdata_o, RTdata_o;
 
-reg  signed [32-1:0] Reg_File [0:32-1];  // 32 word registers
+reg signed [32-1:0] Reg_File [0:32-1];  // 32 word registers
 
 // Read the data
 assign RSdata_o = Reg_File[RSaddr_i];

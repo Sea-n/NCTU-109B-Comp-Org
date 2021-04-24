@@ -15,8 +15,6 @@ input rst_i;
 input [32-1:0] pc_in_i;
 output reg [32-1:0] pc_out_o;
 
-// Parameter
-
 // Main function
 always @(posedge clk_i) begin
 	if(~rst_i)
