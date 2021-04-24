@@ -20,17 +20,17 @@ Simple_Single_CPU cpu(
 always #(`CYCLE_TIME/2) CLK = ~CLK;
 
 initial begin
-	handle = $fopen("CO_P2_Result.txt");
+	handle = $fopen("results.txt");
 	CLK = 0;
 	RST = 0;
 	count = 0;
 	end_count = 25;
 	#(`CYCLE_TIME) RST = 1;
 	#(`CYCLE_TIME*`END_COUNT) $fclose(handle);
-	$stop;
+	$finish;
 end
 
-// Print result to "CO_P2_Result.txt"
+// Print result to the file
 always @(posedge CLK) begin
 	count = count + 1;
 	if (count == `END_COUNT) begin

@@ -29,6 +29,6 @@ always @(ctrl_i, src1_i, src2_i) begin
 	endcase
 end
 
-assign zero_o <= ~|result_o;
+assign zero_o = ~|result_o;
 
 endmodule

@@ -14,7 +14,8 @@ input clk_i, rst_i;
 wire ALUSrc, ALU_zero, branch, RegWrite, RegDst;
 wire [2:0] ALUOp;
 wire [3:0] ALUCtrl;
-wire [31:0] PC_in, PC_out, IM_out, RDaddr, RDdata, RSdata, RTdata;
+wire [4:0] RDaddr;
+wire [31:0] PC_in, PC_out, IM_out, RDdata, RSdata, RTdata;
 wire [31:0] SE_out, ALU_src2, Adder1_out, Adder2_out, Adder2_in;
 
 // Greate componentes
