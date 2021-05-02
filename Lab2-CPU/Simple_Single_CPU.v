@@ -21,7 +21,7 @@ wire [31:0] SE_out, ALU_src2, Adder1_out, Adder2_out, Adder2_in;
 // Greate componentes
 ProgramCounter PC(
 	.clk_i(clk_i),
-	.rst_i (rst_i),
+	.rst_i(rst_i),
 	.pc_in_i(PC_in),
 	.pc_out_o(PC_out)
 );
