@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-`define CYCLE_TIME 50			
+`define CYCLE_TIME 5
 
 module testbench;
 reg Clk, Start;
@@ -33,7 +33,7 @@ begin
     Start = 0;
     
     #(`CYCLE_TIME) Start = 1;
-    #(`CYCLE_TIME*320)	$stop;
+    #(`CYCLE_TIME*140)	$stop;
 end
   
 always@(posedge Clk) begin
