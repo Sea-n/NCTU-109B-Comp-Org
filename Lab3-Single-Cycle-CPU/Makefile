@@ -2,15 +2,15 @@ all: run1 run2
 
 compile:
 	iverilog -o cpu ALU.v ALU_Ctrl.v Adder.v Data_Memory.v Decoder.v \
-		Instr_Memory.v MUX_2to1.v ProgramCounter.v Reg_File.v \
-		Shift_Left_Two_32.v Sign_Extend.v Simple_Single_CPU.v Test_Bench.v
+		Instr_Memory.v MUX_2to1.v MUX_4to1.v ProgramCounter.v Reg_File.v \
+		Shift_Left_Two_32.v Sign_Extend.v Simple_Single_CPU.v testbench.v
 
 run1:
-	cp testcase{1,}.txt
+	cat testcase1.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run2:
-	cp testcase{2,}.txt
+	cat testcase2.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run:
@@ -20,6 +20,6 @@ run:
 
 pack:
 	7z a 0816146.zip ALU.v ALU_Ctrl.v Adder.v Data_Memory.v Decoder.v \
-		Instr_Memory.v MUX_2to1.v ProgramCounter.v Reg_File.v \
-		Shift_Left_Two_32.v Sign_Extend.v Simple_Single_CPU.v Test_Bench.v \
+		Instr_Memory.v MUX_2to1.v MUX_4to1.v ProgramCounter.v Reg_File.v \
+		Shift_Left_Two_32.v Sign_Extend.v Simple_Single_CPU.v testbench.v \
 		report.pdf
