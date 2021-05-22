@@ -11,9 +11,9 @@ module Simple_Single_CPU(
 input clk_i, rst_i;
 
 // Internal Signles
-wire ALU_zero, ALUSrc, Branch, Branch_sel, Jump;
-wire MemRead, MemWrite, RegWrite, RegDst;
-wire [1:0] ALUOp, BranchType, MemToReg;
+wire ALU_zero, ALUSrc, Branch, Branch_sel;
+wire MemRead, MemWrite, RegWrite;
+wire [1:0] ALUOp, BranchType, Jump, MemToReg, RegDst;
 wire [3:0] ALUCtrl;
 wire [4:0] RDaddr;
 wire [31:0] PC_in, PC_out, IM_out, DM_out, RDdata, RSdata, RTdata;
@@ -32,9 +32,11 @@ Instr_Memory IM(
 	.instr_o(IM_out)
 );
 
-MUX_2to1 #(.size(5)) Mux_RegDst(
+MUX_4to1 #(.size(5)) Mux_RegDst(
 	.data0_i(IM_out[20:16]),
 	.data1_i(IM_out[15:11]),
+	.data2_i(5'd31),
+	.data3_i(5'd0),
 	.select_i(RegDst),
 	.data_o(RDaddr)
 );
@@ -43,7 +45,7 @@ MUX_4to1 #(.size(32)) Mux_MemToReg(
 	.data0_i(ALU_out),
 	.data1_i(DM_out),
 	.data2_i(SE_out),
-	.data3_i(32'b0),
+	.data3_i(Adder1_out),
 	.select_i(MemToReg),
 	.data_o(RDdata)
 );
@@ -63,6 +65,7 @@ Reg_File Registers(
 Decoder Decoder(
 	.clk_i(clk_i),
 	.instr_op_i(IM_out[31:26]),
+	.function_i(IM_out[5:0]),
 	.ALUOp_o(ALUOp),
 	.ALUSrc_o(ALUSrc),
 	.Branch_o(Branch),
@@ -148,9 +151,11 @@ MUX_4to1 #(.size(1)) Mux_Branch(
 	.data_o(Branch_sel)
 );
 
-MUX_2to1 #(.size(32)) Mux_PC_Jump(
+MUX_4to1 #(.size(32)) Mux_PC_Jump(
 	.data0_i({Adder1_out[31:28], shl1_out[27:0]}),
 	.data1_i(Branch_out),
+	.data2_i(RSdata),
+	.data3_i(32'b0),
 	.select_i(Jump),
 	.data_o(PC_in)
 );

@@ -26,7 +26,7 @@ assign RTdata_o = Reg_Bank[RTaddr_i];
 
 // Writing data when postive edge clk_i and RegWrite_i was set.
 always @(posedge rst_i, posedge clk_i) begin
-	if (rst_i == 0) begin
+	if (~rst_i) begin
 		Reg_Bank[0]  <= 0; Reg_Bank[1]  <= 0; Reg_Bank[2]  <= 0; Reg_Bank[3]  <= 0;
 		Reg_Bank[4]  <= 0; Reg_Bank[5]  <= 0; Reg_Bank[6]  <= 0; Reg_Bank[7]  <= 0;
 		Reg_Bank[8]  <= 0; Reg_Bank[9]  <= 0; Reg_Bank[10] <= 0; Reg_Bank[11] <= 0;
@@ -34,7 +34,7 @@ always @(posedge rst_i, posedge clk_i) begin
 		Reg_Bank[16] <= 0; Reg_Bank[17] <= 0; Reg_Bank[18] <= 0; Reg_Bank[19] <= 0;
 		Reg_Bank[20] <= 0; Reg_Bank[21] <= 0; Reg_Bank[22] <= 0; Reg_Bank[23] <= 0;
 		Reg_Bank[24] <= 0; Reg_Bank[25] <= 0; Reg_Bank[26] <= 0; Reg_Bank[27] <= 0;
-		Reg_Bank[28] <= 0; Reg_Bank[29] <= 0; Reg_Bank[30] <= 0; Reg_Bank[31] <= 0;
+		Reg_Bank[28] <= 0; Reg_Bank[29]<=128; Reg_Bank[30] <= 0; Reg_Bank[31] <= 0;
 	end else begin
 		if (RegWrite_i)
 			Reg_Bank[RDaddr_i] <= RDdata_i;

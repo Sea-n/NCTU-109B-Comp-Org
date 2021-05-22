@@ -19,7 +19,7 @@ initial begin
 	$dumpvars;
 
 	#(`CYCLE_TIME) rst = 1;
-	#(`CYCLE_TIME * 140)
+	#(`CYCLE_TIME * 150)
 
 	$display("PC = %d", CPU.PC.pc_out_o);
 
