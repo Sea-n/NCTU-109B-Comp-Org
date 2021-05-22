@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 
 // Author: 0816146 韋詠祥
+// Repo: https://github.com/Sea-n/NCTU-109B-Comp-Org
 
 module Simple_Single_CPU(
 	clk_i,
