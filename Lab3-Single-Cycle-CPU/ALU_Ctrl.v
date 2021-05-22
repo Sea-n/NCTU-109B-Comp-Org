@@ -26,7 +26,7 @@ always @(funct_i, ALUOp_i) begin
 			6'b101010: ALUCtrl_o <= 4'h7;  // SLT
 			default:   ALUCtrl_o <= 4'hE;
 		endcase
-		2'b11: ALUCtrl_o <= 4'hF;
+		2'b11: ALUCtrl_o <= 4'h7;  // SLT
 	endcase
 end
 

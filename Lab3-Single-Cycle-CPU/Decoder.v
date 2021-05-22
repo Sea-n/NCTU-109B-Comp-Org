@@ -39,11 +39,12 @@ always @(instr_op_i, function_i) begin
 		6'b000100: ALUOp_o <= 2'b01;  // beq  SUB
 		6'b00100?: ALUOp_o <= 2'b00;  // addi / addiu  ADD
 		6'b10?011: ALUOp_o <= 2'b00;  // lw / sw  ADD
+		6'b001010: ALUOp_o <= 2'b11;  // slti  SLT
 		default:   ALUOp_o <= 2'b10;
 	endcase
 
 	casez (instr_op_i)
-		6'b001000: ALUSrc_o <= 1'b1;  // addi
+		6'b0010??: ALUSrc_o <= 1'b1;  // addi / addiu / slti / sltiu
 		6'b10?011: ALUSrc_o <= 1'b1;  // lw / sw
 		default:   ALUSrc_o <= 1'b0;
 	endcase
@@ -64,7 +65,7 @@ always @(instr_op_i, function_i) begin
 	endcase
 
 	casez (instr_op_i)
-		6'b001000: RegDst_o <= 2'b00;  // addi
+		6'b0010??: RegDst_o <= 2'b00;  // addi / addiu / slti / sltiu
 		6'b100011: RegDst_o <= 2'b00;  // lw
 		6'b000011: RegDst_o <= 2'b10;  // jal
 		default:   RegDst_o <= 2'b01;
@@ -72,7 +73,7 @@ always @(instr_op_i, function_i) begin
 
 	casez (instr_op_i)
 		6'b000000: RegWrite_o <= 1;  // add
-		6'b00100?: RegWrite_o <= 1;  // addi / addiu
+		6'b0010??: RegWrite_o <= 1;  // addi / addiu / slti / sltiu
 		6'b100011: RegWrite_o <= 1;  // lw
 		6'b000011: RegWrite_o <= 1;  // jal
 		default:   RegWrite_o <= 0;
