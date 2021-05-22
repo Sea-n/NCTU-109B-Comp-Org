@@ -6,7 +6,6 @@
 
 module testbench;
 reg clk, rst;
-integer end_count;
 
 Simple_Single_CPU CPU(clk, rst);
 

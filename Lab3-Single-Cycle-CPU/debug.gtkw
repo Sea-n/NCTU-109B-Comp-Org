@@ -1,0 +1,75 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Sat May 22 05:15:00 2021
+[*]
+[dumpfile] "/Users/sean/Documents/Code/Repos/NCTU-109B-Comp-Org/Lab3-Single-Cycle-CPU/debug.vcd"
+[dumpfile_mtime] "Sat May 22 05:05:48 2021"
+[dumpfile_size] 15888
+[savefile] "/Users/sean/Documents/Code/Repos/NCTU-109B-Comp-Org/Lab3-Single-Cycle-CPU/debug.gtkw"
+[timestart] 0
+[size] 1920 1080
+[pos] -1 -1
+*-15 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.CPU.
+[sst_width] 193
+[signals_width] 252
+[sst_expanded] 1
+[sst_vpaned_height] 335
+@28
+testbench.clk
+@22
+testbench.CPU.PC_in[31:0]
+testbench.CPU.PC_out[31:0]
+testbench.CPU.IM_out[31:0]
+@200
+-
+-ALU
+@22
+testbench.CPU.ALU.ctrl_i[3:0]
+testbench.CPU.ALU.src1_i[31:0]
+testbench.CPU.ALU.src2_i[31:0]
+testbench.CPU.ALU.result_o[31:0]
+@28
+testbench.CPU.ALU.zero_o
+@200
+-
+-Data Memory
+@22
+testbench.CPU.Data_Memory.addr_i[31:0]
+testbench.CPU.Data_Memory.data_i[31:0]
+testbench.CPU.Data_Memory.data_o[31:0]
+@28
+testbench.CPU.Data_Memory.MemRead_i
+testbench.CPU.Data_Memory.MemWrite_i
+@200
+-
+-Register
+@22
+testbench.CPU.Registers.RDaddr_i[4:0]
+testbench.CPU.Registers.RDdata_i[31:0]
+testbench.CPU.Registers.RSaddr_i[4:0]
+testbench.CPU.Registers.RSdata_o[31:0]
+testbench.CPU.Registers.RTaddr_i[4:0]
+testbench.CPU.Registers.RTdata_o[31:0]
+@28
+testbench.CPU.Registers.RegWrite_i
+@200
+-
+@201
+-Decoder
+@22
+testbench.CPU.Decoder.instr_op_i[5:0]
+@28
+testbench.CPU.Decoder.ALUOp_o[1:0]
+testbench.CPU.Decoder.ALUSrc_o
+testbench.CPU.Decoder.BranchType_o[1:0]
+testbench.CPU.Decoder.Branch_o
+testbench.CPU.Decoder.Jump_o
+testbench.CPU.Decoder.MemRead_o
+testbench.CPU.Decoder.MemToReg_o[1:0]
+testbench.CPU.Decoder.MemWrite_o
+testbench.CPU.Decoder.RegDst_o
+testbench.CPU.Decoder.RegWrite_o
+[pattern_trace] 1
+[pattern_trace] 0

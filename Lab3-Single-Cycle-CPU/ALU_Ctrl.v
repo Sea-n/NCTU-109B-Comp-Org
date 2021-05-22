@@ -8,15 +8,26 @@ module ALU_Ctrl(
 
 // I/O ports
 input [6-1:0] funct_i;
-input [3-1:0] ALUOp_i;
-output [4-1:0] ALUCtrl_o;
+input [2-1:0] ALUOp_i;
+output reg [4-1:0] ALUCtrl_o;
 
 // Parameter
 
 // Select exact operation
-assign ALUCtrl_o[3] = 0;
-assign ALUCtrl_o[2] = ALUOp_i[1] | ALUOp_i[0] | (~|ALUOp_i & funct_i[1]);
-assign ALUCtrl_o[1] = |ALUOp_i | ~funct_i[2];
-assign ALUCtrl_o[0] = ALUOp_i[0] | (~|ALUOp_i & (funct_i[3] ^ funct_i[0]));
+always @(funct_i, ALUOp_i) begin
+	case (ALUOp_i)
+		2'b00: ALUCtrl_o <= 4'h2;  // ADD
+		2'b01: ALUCtrl_o <= 4'h6;  // SUB
+		2'b10: case (funct_i)
+			6'b100000: ALUCtrl_o <= 4'h2;  // ADD
+			6'b100010: ALUCtrl_o <= 4'h6;  // SUB
+			6'b100100: ALUCtrl_o <= 4'h0;  // AND
+			6'b100101: ALUCtrl_o <= 4'h1;  // OR
+			6'b101010: ALUCtrl_o <= 4'h7;  // SLT
+			default:   ALUCtrl_o <= 4'hE;
+		endcase
+		2'b11: ALUCtrl_o <= 4'hF;
+	endcase
+end
 
 endmodule

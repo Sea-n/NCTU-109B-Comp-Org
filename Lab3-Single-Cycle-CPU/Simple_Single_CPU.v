@@ -13,8 +13,7 @@ input clk_i, rst_i;
 // Internal Signles
 wire ALU_zero, ALUSrc, Branch, Branch_sel, Jump;
 wire MemRead, MemWrite, RegWrite, RegDst;
-wire [1:0] BranchType, MemToReg;
-wire [2:0] ALUOp;
+wire [1:0] ALUOp, BranchType, MemToReg;
 wire [3:0] ALUCtrl;
 wire [4:0] RDaddr;
 wire [31:0] PC_in, PC_out, IM_out, DM_out, RDdata, RSdata, RTdata;
@@ -133,14 +132,14 @@ Adder Adder2(
 	.sum_o(Adder2_out)
 );
 
-MUX_2to1 #(.size(32)) Mux_Branch(
+MUX_2to1 #(.size(32)) Mux_PC_Branch(
 	.data0_i(Adder1_out),
 	.data1_i(Adder2_out),
 	.select_i(Branch & Branch_sel),
 	.data_o(Branch_out)
 );
 
-MUX_4to1 #(.size(1)) Mux_PC_Branch(
+MUX_4to1 #(.size(1)) Mux_Branch(
 	.data0_i(ALU_zero),
 	.data1_i(~(ALU_out[31] | ALU_zero)),
 	.data2_i(~ALU_out[31]),
