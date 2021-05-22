@@ -3,7 +3,7 @@ _04:     addi   r2, r0, 2    // r2 = 2
 _08:     addi   r3, r0, 3    // r3 = 3
 _0C:     addi   r4, r0, 4    // r4 = 4
 _10:     addi   r5, r0, 5    // r5 = 5
-_14:     jump   j
+_14:     j      j            // jump to j:
 _18:     addi   r1, r0, 31   // 若 jump 對
 _1C:     addi   r2, r0, 63   // 這兩個 addi 將不會執行
 
