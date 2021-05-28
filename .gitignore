@@ -1,4 +1,6 @@
-*.vcd
-.DS_Store
+testcase.txt
 0816146.zip
+.DS_Store
 *.pages
+*.vcd
+cpu
