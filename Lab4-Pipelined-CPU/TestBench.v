@@ -7,7 +7,7 @@
 module testbench;
 reg clk, rst;
 
-Simple_Single_CPU CPU(clk, rst);
+Pipe_CPU CPU(clk, rst);
 
 always #(`CYCLE_TIME/2)
 	clk = ~clk;

@@ -20,6 +20,7 @@ reg [31:0] data_o;
 
 // Memory
 reg [7:0] Mem [0:127];  // address: 0x00~0x80
+integer i;
 
 // For Testbench to debug
 wire [31:0] memory [0:31];
@@ -55,6 +56,11 @@ assign memory[28] = {Mem[115], Mem[114], Mem[113], Mem[112]};
 assign memory[29] = {Mem[119], Mem[118], Mem[117], Mem[116]};
 assign memory[30] = {Mem[123], Mem[122], Mem[121], Mem[120]};
 assign memory[31] = {Mem[127], Mem[126], Mem[125], Mem[124]};
+
+initial begin
+	for (i=0; i<128; i=i+1)
+		Mem[i] = 8'b0;
+end
 
 always @(posedge clk_i) begin
 	if (MemWrite_i) begin
