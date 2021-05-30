@@ -25,10 +25,10 @@ output reg MemRead_o, MemWrite_o, RegWrite_o;
 
 // Main function
 always @(instr_op_i) begin
-	Branch_o     <=  instr_op_i[2];
+	Branch_o     <=  instr_op_i[5:2] == 4'b0001;
 	BranchType_o <=  instr_op_i[5:1] == 5'b00010
-		? (instr_op_i[0] ? 2'b11 : 2'b00)
-		: (instr_op_i[1] ? 2'b01 : 2'b10);
+		? (instr_op_i[0] ? 2'b11 : 2'b00)   // bne / beq
+		: (instr_op_i[0] ? 2'b01 : 2'b10);  // bgtz / blez
 	MemRead_o    <=  instr_op_i == 6'b100011;  // lw
 	MemWrite_o   <=  instr_op_i == 6'b101011;  // sw
 end

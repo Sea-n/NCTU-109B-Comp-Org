@@ -12,34 +12,20 @@ module Pipe_CPU(
 input clk_i, rst_i;
 
 // Internal Signles
-wire ALU_zero, ALUSrc, Branch, Branch_sel;
+wire ALU_zero, ALUSrc, Branch;
 wire MemRead, MemWrite, RegWrite;
 wire [1:0] ALUOp, BranchType, Jump, MemToReg, RegDst;
 wire [3:0] ALUCtrl;
 wire [4:0] RDaddr;
 wire [31:0] PC_in, PC_out, IM_out, DM_out, RDdata, RSdata, RTdata;
-wire [31:0] SE_out, ALU_src2, ALU_out, Adder1_out, Adder2_out, Branch_out, shl1_out, shl2_out;
+wire [31:0] SE_out, ALU_src2, ALU_out, Adder1_out, Adder2_out, shl1_out;
 
 
 // Instruction Fetch stage
-MUX_2to1 #(.size(32)) Mux_PC_Branch(
+MUX_2to1 #(.size(32)) Mux_PC(
 	.data0_i(Adder1_out),
 	.data1_i(Adder2_out),
-	.select_i(Branch & Branch_sel),
-	.data_o(Branch_out)
-);
-
-Shift_Left_Two_32 Shifter1(
-	.data_i(IM_out),
-	.data_o(shl1_out)
-);
-
-MUX_4to1 #(.size(32)) Mux_PC_Jump(
-	.data0_i({Adder1_out[31:28], shl1_out[27:0]}),
-	.data1_i(Branch_out),
-	.data2_i(RSdata),
-	.data3_i(32'b0),
-	.select_i(Jump),
+	.select_i(Branch & ~ALU_zero),
 	.data_o(PC_in)
 );
 
@@ -126,14 +112,14 @@ ALU ALU(
 	.zero_o(ALU_zero)
 );
 
-Shift_Left_Two_32 Shifter2(
+Shift_Left_Two_32 Shifter1(
 	.data_i(SE_out),
-	.data_o(shl2_out)
+	.data_o(shl1_out)
 );
 
 Adder Adder2(
 	.src1_i(Adder1_out),
-	.src2_i(shl2_out),
+	.src2_i(shl1_out),
 	.sum_o(Adder2_out)
 );
 
@@ -145,15 +131,6 @@ Data_Memory Data_Memory(
 	.MemRead_i(MemRead),
 	.MemWrite_i(MemWrite),
 	.data_o(DM_out)
-);
-
-MUX_4to1 #(.size(1)) Mux_Branch(
-	.data0_i(ALU_zero),
-	.data1_i(~(ALU_out[31] | ALU_zero)),
-	.data2_i(~ALU_out[31]),
-	.data3_i(~ALU_zero),
-	.select_i(BranchType),
-	.data_o(Branch_sel)
 );
 
 // Write Back stage
