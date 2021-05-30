@@ -20,8 +20,7 @@ module Decoder(
 input clk_i;
 input [6-1:0] instr_op_i, function_i;
 output reg [2-1:0] ALUOp_o, BranchType_o, Jump_o, MemToReg_o, RegDst_o;
-output reg ALUSrc_o, Branch_o;
-output reg MemRead_o, MemWrite_o, RegWrite_o;
+output reg ALUSrc_o, Branch_o, MemRead_o, MemWrite_o, RegWrite_o;
 
 // Main function
 always @(instr_op_i) begin

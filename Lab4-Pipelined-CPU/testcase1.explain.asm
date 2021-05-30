@@ -1,3 +1,16 @@
+_00:  addi  r1, r0, 3   # r1 = 3
+_04:  addi  r2, r0, 4   # r2 = 4
+_08:  addi  r3, r0, 1   # r3 = 1
+_0C:  sw    r1, 4(r0)   # A[1] = r1 = 3
+_10:  add   r4, r1, r1  # r4 = r1 + r1 = 6
+_14:  or    r6, r1, r2  # r6 = r1 | r2 = 7
+_18:  and   r7, r1, r3  # r7 = r1 & r3 = 1
+_1C:  sub   r5, r4, r2  # r5 = r4 - r2 = 2
+_20:  slt   r8, r1, r2  # r8 = r1 < r2 = 1
+_24:  beq   r1, r2, begin  # false
+_28:  lw    r10, r(r0)  # r10 = A[1] = 3
+
+
 # Register
 R0  = 0, R1  = 3, R2  = 4, R3  = 1, R4  = 6, R5  = 2, R6  = 7, R7  = 1
 R8  = 1, R9  = 0, R10 = 3, R11 = 0, R12 = 0, R13 = 0, R14 = 0, R15 = 0
