@@ -21,8 +21,8 @@ output [32-1:0] RSdata_o, RTdata_o;
 reg signed [32-1:0] Reg_Bank [0:32-1];  // 32 word registers
 
 // Read the data
-assign RSdata_o = Reg_Bank[RSaddr_i];
-assign RTdata_o = Reg_Bank[RTaddr_i];
+assign RSdata_o = RSaddr_i == RDaddr_i ? RDdata_i : Reg_Bank[RSaddr_i];
+assign RTdata_o = RTaddr_i == RDaddr_i ? RDdata_i : Reg_Bank[RTaddr_i];
 
 // Writing data when postive edge clk_i and RegWrite_i was set.
 always @(posedge rst_i, posedge clk_i) begin

@@ -8,7 +8,7 @@ _18:  and   r7, r1, r3  # r7 = r1 & r3 = 1
 _1C:  sub   r5, r4, r2  # r5 = r4 - r2 = 2
 _20:  slt   r8, r1, r2  # r8 = r1 < r2 = 1
 _24:  beq   r1, r2, begin  # false
-_28:  lw    r10, r(r0)  # r10 = A[1] = 3
+_28:  lw    r10, 4(r0)  # r10 = A[1] = 3
 
 
 # Register
