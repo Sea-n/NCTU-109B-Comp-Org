@@ -1,14 +1,13 @@
 _00:  addi  r1, r0, 16   # r1 = 16
 _04:  addi  r3, r0, 8    # r3 = 8
-_08:  addi  r0, r0, 0    # nop
-_0C:  addi  r2, r1, 4    # r2 = r1 + 4 = 20
-_10:  sw    r1, 4(r0)    # A[1] = r1 = 16
+_08:  addi  r9, r0, 100  # r9 = 100
+_0C:  sw    r1, 4(r0)    # A[1] = r1 = 16
+_10:  addi  r2, r1, 4    # r2 = r1 + 4 = 20
 _14:  lw    r4, 4(r0)    # r4 = A[1] = 16
-_18:  add   r6, r3, r1   # r6 = r3 - r1 = -8
-_1C:  addi  r7, r1, 10   # r7 = r1 + 10 = 26
+_18:  addi  r7, r1, 10   # r7 = r1 + 10 = 26
+_1C:  add   r6, r3, r1   # r6 = r3 - r1 = -8
 _20:  sub   r5, r4, r3   # r5 = r4 - r3 = 8
-_24:  addi  r9, r0, 100  # r9 = 100
-_28:  and   r8, r7, r3   # r8 = r7 & r3 = 8
+_24:  and   r8, r7, r3   # r8 = r7 & r3 = 8
 
 
 # Register
