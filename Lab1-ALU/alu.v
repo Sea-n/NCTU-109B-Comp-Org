@@ -63,8 +63,8 @@ always @(posedge clk, negedge rst_n) begin
 		overflow <= 1'b0;
 	end else begin
 		if (ALU_control[1:0] == 2'b10) begin  // ADD & SUB
-			cout <= (src1[31] ^ src2[31] ^ ALU_control[2]) ? 1'b0 : src1[31] ^ res[31];
-			overflow <= ALU_control[2] ^ carry[31];
+			cout <= carry[31];
+			overflow <= (src1[31] ^ src2[31] ^ ALU_control[2]) ? 1'b0 : src1[31] ^ res[31];
 		end else begin
 			cout <= (ALU_control == 4'b0111) ? 1'b0 : carry[31];  // SLT
 			overflow <= 1'b0;

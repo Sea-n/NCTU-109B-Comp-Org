@@ -36,23 +36,23 @@ def main():
             if src1 & 0x80000000:
                 if src2 & 0x80000000:
                     if not res & 0x80000000:
-                        zcv |= 0b010
+                        zcv |= 0b001
             else:
                 if not src2 & 0x80000000:
                     if res & 0x80000000:
-                        zcv |= 0b010
+                        zcv |= 0b001
 
         if op == 0b0110:  # SUB
-            res = src1 - src2
+            res = src1 + (-src2 & 0xFFFFFFFF)
 
             if src1 & 0x80000000:
                 if not src2 & 0x80000000:
                     if not res & 0x80000000:
-                        zcv |= 0b010
+                        zcv |= 0b001
             else:
                 if src2 & 0x80000000:
                     if res & 0x80000000:
-                        zcv |= 0b010
+                        zcv |= 0b001
 
         if op == 0b1100:  # NOR
             res = ~(src1 | src2) & 0xFFFFFFFF
@@ -61,7 +61,7 @@ def main():
             res = 1 if int32(src1) < int32(src2) else 0
 
         if res & 0x100000000:
-            zcv |= 0b001
+            zcv |= 0b010
 
         if res == 0:
             zcv |= 0b100
