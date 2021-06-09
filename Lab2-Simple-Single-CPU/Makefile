@@ -1,4 +1,4 @@
-all: run1 run2
+all: run1 run2 run3
 
 compile:
 	iverilog -o cpu ALU.v ALU_Ctrl.v Adder.v Decoder.v Instr_Memory.v \
@@ -11,6 +11,10 @@ run1:
 
 run2:
 	cp testcase{2,}.txt
+	@make run
+
+run3:
+	cp testcase{3,}.txt
 	@make run
 
 run:
