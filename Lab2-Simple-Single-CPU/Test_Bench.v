@@ -3,7 +3,7 @@
 // Author: 0816146 韋詠祥
 
 `define CYCLE_TIME 10
-`define END_COUNT 14
+`define END_COUNT 25
 module TestBench;
 
 // Internal Signals

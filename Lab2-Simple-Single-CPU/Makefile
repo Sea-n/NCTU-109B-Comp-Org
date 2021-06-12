@@ -6,15 +6,15 @@ compile:
 		Sign_Extend.v Simple_Single_CPU.v Test_Bench.v
 
 run1:
-	cp testcase{1,}.txt
+	cat testcase1.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run2:
-	cp testcase{2,}.txt
+	cat testcase2.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run3:
-	cp testcase{3,}.txt
+	cat testcase3.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run:
