@@ -14,11 +14,12 @@ input clk_i, rst_i;
 // Internal signals
 wire ALU_zero, ALU_zero_s4;
 wire [3:0] ALUCtrl;
+wire [4:0] RSaddr, RTaddr, RSaddr_s3, RTaddr_s3;
 wire [4:0] RDaddr, RDaddr_s4, RDaddr_s5;
 
 wire [31:0] PC_in, PC_out, IM_out, IM_out_s2, IM_out_s3;
 wire [31:0] RDdata, RSdata, RSdata_s3, RTdata, RTdata_s3, RTdata_s4;
-wire [31:0] ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5, shl1_out;
+wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5, shl1_out;
 wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder2_out, Adder2_out_s4;
 wire [31:0] SE_out, SE_out_s3, DM_out, DM_out_s5;
 
@@ -29,6 +30,9 @@ wire Branch_s4, MemRead_s4, MemWrite_s4, RegWrite_s4, RegWrite_s5;
 wire [1:0] ALUOp, BranchType, Jump, MemToReg, RegDst;
 wire [1:0] ALUOp_s3, MemToReg_s3, RegDst_s3;
 wire [1:0] MemToReg_s4, MemToReg_s5;
+
+// Forwarding and Hazard Dection
+wire [1:0] ForwardA, ForwardB;
 
 
 // Instruction Fetch stage
@@ -66,8 +70,8 @@ Sign_Extend Sign_Extend(
 Reg_File Registers(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
-	.RSaddr_i(IM_out_s2[25:21]),
-	.RTaddr_i(IM_out_s2[20:16]),
+	.RSaddr_i(RSaddr),
+	.RTaddr_i(RTaddr),
 	.RDaddr_i(RDaddr_s5),
 	.RDdata_i(RDdata),
 	.RegWrite_i(RegWrite_s5),
@@ -107,15 +111,33 @@ ALU_Ctrl ALU_Ctrl(
 	.ALUCtrl_o(ALUCtrl)
 );
 
-MUX_2to1 #(.size(32)) Mux_ALUSrc(
+MUX_2to1 #(.size(32)) Mux_ALUSrc0(
 	.data0_i(RTdata_s3),
 	.data1_i(SE_out_s3),
 	.select_i(ALUSrc_s3),
+	.data_o(ALU_src0)
+);
+
+MUX_4to1 #(.size(32)) Mux_ALUSrc1(
+	.data0_i(RSdata_s3),
+	.data1_i(RDdata),
+	.data2_i(ALU_out_s4),
+	.data3_i(ALU_out_s4),
+	.select_i(ForwardA),
+	.data_o(ALU_src1)
+);
+
+MUX_4to1 #(.size(32)) Mux_ALUSrc2(
+	.data0_i(ALU_src0),
+	.data1_i(RDdata),
+	.data2_i(ALU_out_s4),
+	.data3_i(ALU_out_s4),
+	.select_i(ForwardB),
 	.data_o(ALU_src2)
 );
 
 ALU ALU(
-	.src1_i(RSdata_s3),
+	.src1_i(ALU_src1),
 	.src2_i(ALU_src2),
 	.ctrl_i(ALUCtrl),
 	.result_o(ALU_out),
@@ -131,6 +153,17 @@ Adder Adder2(
 	.src1_i(Adder1_out_s3),
 	.src2_i(shl1_out),
 	.sum_o(Adder2_out)
+);
+
+Forwarding Forwarding(
+	.RSaddr_i(RSaddr),
+	.RTaddr_i(RTaddr),
+	.RDaddr_s4_i(RDaddr_s4),
+	.RDaddr_s5_i(RDaddr_s5),
+	.RegWrite_s4_i(RegWrite_s4),
+	.RegWrite_s5_i(RegWrite_s5),
+	.ForwardA_o(ForwardA),
+	.ForwardB_o(ForwardB)
 );
 
 // Memory access stage
@@ -166,6 +199,15 @@ Pipe_Reg #(.size(5 * 2)) reg150(
 	.rst_i(rst_i),
 	.data_i({RDaddr, RDaddr_s4}),
 	.data_o({RDaddr_s4, RDaddr_s5})
+);
+
+assign RSaddr = IM_out_s2[25:21];
+assign RTaddr = IM_out_s2[20:16];
+Pipe_Reg #(.size(5 * 2)) reg151(
+	.clk_i(clk_i),
+	.rst_i(rst_i),
+	.data_i({RSaddr, RTaddr}),
+	.data_o({RSaddr_s3, RTaddr_s3})
 );
 
 Pipe_Reg #(.size(32 * 2)) reg190(
