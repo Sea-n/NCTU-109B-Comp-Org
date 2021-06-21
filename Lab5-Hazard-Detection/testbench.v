@@ -3,6 +3,7 @@
 // Author: 0816146 韋詠祥
 
 `define CYCLE_TIME 10
+`define END_COUNT 30
 
 module testbench;
 reg clk, rst;
@@ -19,7 +20,7 @@ initial begin
 	$dumpvars;
 
 	#(`CYCLE_TIME) rst = 1;
-	#(`CYCLE_TIME * 20)
+	#(`CYCLE_TIME * `END_COUNT)
 
 	$display("PC = %d", CPU.PC.pc_out_o);
 

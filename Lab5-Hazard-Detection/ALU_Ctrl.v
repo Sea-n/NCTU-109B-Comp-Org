@@ -24,6 +24,7 @@ always @(funct_i, ALUOp_i) begin
 			6'b100100: ALUCtrl_o <= 4'h0;  // AND
 			6'b100101: ALUCtrl_o <= 4'h1;  // OR
 			6'b101010: ALUCtrl_o <= 4'h7;  // SLT
+			6'b011000: ALUCtrl_o <= 4'hA;  // MUL
 			default:   ALUCtrl_o <= 4'hE;
 		endcase
 		2'b11: ALUCtrl_o <= 4'h7;  // SLT
