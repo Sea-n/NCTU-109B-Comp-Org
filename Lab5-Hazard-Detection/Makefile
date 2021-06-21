@@ -2,7 +2,7 @@ all: run1
 
 compile:
 	iverilog -o cpu ALU.v ALU_Ctrl.v Adder.v Data_Memory.v Decoder.v \
-		Forwarding.v Instr_Memory.v MUX_2to1.v MUX_4to1.v Pipe_CPU.v \
+		Forwarding.v Hazard.v Instr_Memory.v MUX_2to1.v MUX_4to1.v Pipe_CPU.v \
 		Pipe_Reg.v ProgramCounter.v Reg_File.v Shift_Left_Two_32.v \
 		Sign_Extend.v testbench.v
 
@@ -18,6 +18,6 @@ run:
 
 pack:
 	7z a 0816146.zip ALU.v ALU_Ctrl.v Adder.v Data_Memory.v Decoder.v \
-		Forwarding.v Instr_Memory.v MUX_2to1.v MUX_4to1.v Pipe_CPU.v \
+		Forwarding.v Hazard.v Instr_Memory.v MUX_2to1.v MUX_4to1.v Pipe_CPU.v \
 		Pipe_Reg.v ProgramCounter.v Reg_File.v Shift_Left_Two_32.v \
 		Sign_Extend.v testbench.v report.pdf

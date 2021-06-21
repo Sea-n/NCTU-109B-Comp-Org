@@ -18,7 +18,7 @@ wire [4:0] RSaddr, RTaddr, RSaddr_s3, RTaddr_s3;
 wire [4:0] RDaddr, RDaddr_s4, RDaddr_s5;
 
 wire [31:0] PC_in, PC_out, IM_out, IM_out_s2, IM_out_s3;
-wire [31:0] RDdata, RSdata, RSdata_s3, RTdata, RTdata_s3, RTdata_s4;
+wire [31:0] RDdata, RDdata_s5, RSdata, RSdata_s3, RTdata, RTdata_s3, RTdata_s4;
 wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5, shl1_out;
 wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder2_out, Adder2_out_s4;
 wire [31:0] SE_out, SE_out_s3, DM_out, DM_out_s5;
@@ -32,7 +32,8 @@ wire [1:0] ALUOp_s3, MemToReg_s3, RegDst_s3;
 wire [1:0] MemToReg_s4, MemToReg_s5;
 
 // Forwarding and Hazard Dection
-wire [1:0] ForwardA, ForwardB;
+wire Stall;
+wire [1:0] ForwardA, ForwardB
 
 
 // Instruction Fetch stage
@@ -46,6 +47,7 @@ MUX_2to1 #(.size(32)) Mux_PC(
 ProgramCounter PC(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(Stall),
 	.pc_in_i(PC_in),
 	.pc_out_o(PC_out)
 );
@@ -73,7 +75,7 @@ Reg_File Registers(
 	.RSaddr_i(RSaddr),
 	.RTaddr_i(RTaddr),
 	.RDaddr_i(RDaddr_s5),
-	.RDdata_i(RDdata),
+	.RDdata_i(RDdata_s5),
 	.RegWrite_i(RegWrite_s5),
 	.RSdata_o(RSdata),
 	.RTdata_o(RTdata)
@@ -83,6 +85,7 @@ Decoder Decoder(
 	.clk_i(clk_i),
 	.instr_op_i(IM_out_s2[31:26]),
 	.function_i(IM_out_s2[5:0]),
+	.Stall_i(Stall),
 	.ALUOp_o(ALUOp),
 	.ALUSrc_o(ALUSrc),
 	.Branch_o(Branch),
@@ -93,6 +96,14 @@ Decoder Decoder(
 	.MemWrite_o(MemWrite),
 	.RegWrite_o(RegWrite),
 	.RegDst_o(RegDst)
+);
+
+Hazard Hazard(
+	.RSaddr_i(RSaddr),
+	.RTaddr_i(RTaddr),
+	.RTaddr_s3_i(RTaddr_s3),
+	.MemRead_s3_i(MemRead_s3),
+	.Stall_o(Stall)
 );
 
 // Execute stage
@@ -120,18 +131,18 @@ MUX_2to1 #(.size(32)) Mux_ALUSrc0(
 
 MUX_4to1 #(.size(32)) Mux_ALUSrc1(
 	.data0_i(RSdata_s3),
-	.data1_i(RDdata),
-	.data2_i(ALU_out_s4),
-	.data3_i(ALU_out_s4),
+	.data1_i(RDdata_s5),
+	.data2_i(RDdata),
+	.data3_i(RDdata),
 	.select_i(ForwardA),
 	.data_o(ALU_src1)
 );
 
 MUX_4to1 #(.size(32)) Mux_ALUSrc2(
 	.data0_i(ALU_src0),
-	.data1_i(RDdata),
-	.data2_i(ALU_out_s4),
-	.data3_i(ALU_out_s4),
+	.data1_i(RDdata_s5),
+	.data2_i(RDdata),
+	.data3_i(RDdata),
 	.select_i(ForwardB),
 	.data_o(ALU_src2)
 );
@@ -178,11 +189,11 @@ Data_Memory Data_Memory(
 
 // Write Back stage
 MUX_4to1 #(.size(32)) Mux_MemToReg(
-	.data0_i(ALU_out_s5),
-	.data1_i(DM_out_s5),
+	.data0_i(ALU_out_s4),
+	.data1_i(DM_out),
 	.data2_i(32'b0),
 	.data3_i(32'b0),
-	.select_i(MemToReg_s5),
+	.select_i(MemToReg_s4),
 	.data_o(RDdata)
 );
 
@@ -190,6 +201,7 @@ MUX_4to1 #(.size(32)) Mux_MemToReg(
 Pipe_Reg #(.size(1)) reg110(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i(ALU_zero),
 	.data_o(ALU_zero_s4)
 );
@@ -197,6 +209,7 @@ Pipe_Reg #(.size(1)) reg110(
 Pipe_Reg #(.size(5 * 2)) reg150(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({RDaddr, RDaddr_s4}),
 	.data_o({RDaddr_s4, RDaddr_s5})
 );
@@ -206,41 +219,55 @@ assign RTaddr = IM_out_s2[20:16];
 Pipe_Reg #(.size(5 * 2)) reg151(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({RSaddr, RTaddr}),
 	.data_o({RSaddr_s3, RTaddr_s3})
 );
 
-Pipe_Reg #(.size(32 * 2)) reg190(
+Pipe_Reg #(.size(32)) reg190(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
-	.data_i({IM_out, IM_out_s2}),
-	.data_o({IM_out_s2, IM_out_s3})
+	.keep_i(Stall),
+	.data_i(IM_out),
+	.data_o(IM_out_s2)
 );
 
-Pipe_Reg #(.size(32 * 3)) reg191(
+Pipe_Reg #(.size(32)) reg191(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
-	.data_i({RSdata, RTdata, RTdata_s3}),
-	.data_o({RSdata_s3, RTdata_s3, RTdata_s4})
+	.keep_i(1'b0),
+	.data_i(IM_out_s2),
+	.data_o(IM_out_s3)
 );
 
-Pipe_Reg #(.size(32 * 2)) reg192(
+Pipe_Reg #(.size(32 * 4)) reg192(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
+	.data_i({RSdata, RTdata, RTdata_s3, RDdata}),
+	.data_o({RSdata_s3, RTdata_s3, RTdata_s4, RDdata_s5})
+);
+
+Pipe_Reg #(.size(32 * 2)) reg193(
+	.clk_i(clk_i),
+	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({ALU_out, ALU_out_s4}),
 	.data_o({ALU_out_s4, ALU_out_s5})
 );
 
-Pipe_Reg #(.size(32 * 3)) reg193(
+Pipe_Reg #(.size(32 * 3)) reg194(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({Adder1_out, Adder1_out_s2, Adder2_out}),
 	.data_o({Adder1_out_s2, Adder1_out_s3, Adder2_out_s4})
 );
 
-Pipe_Reg #(.size(32 * 2)) reg194(
+Pipe_Reg #(.size(32 * 2)) reg195(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({SE_out, DM_out}),
 	.data_o({SE_out_s3, DM_out_s5})
 );
@@ -248,6 +275,7 @@ Pipe_Reg #(.size(32 * 2)) reg194(
 Pipe_Reg #(.size(1 * 5)) reg210(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({ALUSrc, Branch, MemRead, MemWrite, RegWrite}),
 	.data_o({ALUSrc_s3, Branch_s3, MemRead_s3, MemWrite_s3, RegWrite_s3})
 );
@@ -255,6 +283,7 @@ Pipe_Reg #(.size(1 * 5)) reg210(
 Pipe_Reg #(.size(1 * 5)) reg211(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({Branch_s3, MemRead_s3, MemWrite_s3, RegWrite_s3, RegWrite_s4}),
 	.data_o({Branch_s4, MemRead_s4, MemWrite_s4, RegWrite_s4, RegWrite_s5})
 );
@@ -262,6 +291,7 @@ Pipe_Reg #(.size(1 * 5)) reg211(
 Pipe_Reg #(.size(2 * 3)) reg220(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({ALUOp, MemToReg, RegDst}),
 	.data_o({ALUOp_s3, MemToReg_s3, RegDst_s3})
 );
@@ -269,6 +299,7 @@ Pipe_Reg #(.size(2 * 3)) reg220(
 Pipe_Reg #(.size(2 * 2)) reg221(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
+	.keep_i(1'b0),
 	.data_i({MemToReg_s3, MemToReg_s4}),
 	.data_o({MemToReg_s4, MemToReg_s5})
 );
