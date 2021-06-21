@@ -29,10 +29,10 @@ always @(instr_op_i) begin
 		Branch_o     <= 1'b0;
 		BranchType_o <= 2'b0;
 	end else begin
-		Branch_o     <=  instr_op_i[5:2] == 4'b0001;
+		Branch_o     <=  instr_op_i[5:1] == 5'b00010 || instr_op_i == 6'b000001 || instr_op_i == 6'b000111;
 		BranchType_o <=  instr_op_i[5:1] == 5'b00010
 			? (instr_op_i[0] ? 2'b11 : 2'b00)   // bne / beq
-			: (instr_op_i[0] ? 2'b01 : 2'b10);  // bgtz / blez
+			: (instr_op_i[1] ? 2'b01 : 2'b10);  // bgtz / bgez
 	end
 end
 

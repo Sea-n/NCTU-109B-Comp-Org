@@ -12,16 +12,17 @@ module Pipe_CPU(
 input clk_i, rst_i;
 
 // Internal signals
-wire ALU_zero, ALU_zero_s4;
+wire ALU_zero, ALU_zero_s4, Branch_sel;
 wire [3:0] ALUCtrl;
 wire [4:0] RSaddr, RTaddr, RSaddr_s3, RTaddr_s3;
 wire [4:0] RDaddr, RDaddr_s4, RDaddr_s5;
 
 wire [31:0] PC_in, PC_out, IM_out, IM_out_s2, IM_out_s3;
 wire [31:0] RDdata, RDdata_s5, RSdata, RSdata_s3, RTdata, RTdata_s3, RTdata_s4;
-wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5, shl1_out;
-wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder2_out, Adder2_out_s4;
-wire [31:0] SE_out, SE_out_s3, DM_out, DM_out_s5;
+wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5;
+wire [31:0] Branch_out, shl1_out, shl2_out;
+wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder1_out_s4, Adder2_out, Adder2_out_s4;
+wire [31:0] SE_out, SE_out_s3, SE_out_s4, DM_out, DM_out_s5;
 
 // Control signals
 wire ALUSrc, Branch, MemRead, MemWrite, RegWrite;
@@ -33,14 +34,37 @@ wire [1:0] MemToReg_s4, MemToReg_s5;
 
 // Forwarding and Hazard Dection
 wire Stall;
-wire [1:0] ForwardA, ForwardB
+wire [1:0] ForwardA, ForwardB;
 
 
 // Instruction Fetch stage
-MUX_2to1 #(.size(32)) Mux_PC(
+MUX_4to1 #(.size(1)) Mux_Branch(
+	.data0_i(ALU_zero),
+	.data1_i(~(ALU_out[31] | ALU_zero)),
+	.data2_i(~ALU_out[31]),
+	.data3_i(~ALU_zero),
+	.select_i(BranchType),
+	.data_o(Branch_sel)
+);
+
+MUX_2to1 #(.size(32)) Mux_PC_Branch(
 	.data0_i(Adder1_out),
-	.data1_i(Adder2_out_s4),
-	.select_i(Branch_s4 & ALU_zero_s4),
+	.data1_i(Adder2_out),
+	.select_i(Branch_s3 & Branch_sel),
+	.data_o(Branch_out)
+);
+
+Shift_Left_Two_32 Shifter1(
+	.data_i(IM_out_s2),
+	.data_o(shl1_out)
+);
+
+MUX_4to1 #(.size(32)) Mux_PC_Jump(  // S2
+	.data0_i({Adder1_out[31:28], shl1_out[27:0]}),
+	.data1_i(Branch_out),
+	.data2_i(RSdata),
+	.data3_i(32'b0),
+	.select_i(Jump),
 	.data_o(PC_in)
 );
 
@@ -101,7 +125,10 @@ Decoder Decoder(
 Hazard Hazard(
 	.RSaddr_i(RSaddr),
 	.RTaddr_i(RTaddr),
+	.RSaddr_s3_i(RSaddr_s3),
 	.RTaddr_s3_i(RTaddr_s3),
+	.Branch_i(Branch),
+	.MemRead_i(MemRead),
 	.MemRead_s3_i(MemRead_s3),
 	.Stall_o(Stall)
 );
@@ -155,14 +182,14 @@ ALU ALU(
 	.zero_o(ALU_zero)
 );
 
-Shift_Left_Two_32 Shifter1(
+Shift_Left_Two_32 Shifter2(
 	.data_i(SE_out_s3),
-	.data_o(shl1_out)
+	.data_o(shl2_out)
 );
 
 Adder Adder2(
-	.src1_i(Adder1_out_s3),
-	.src2_i(shl1_out),
+	.src1_i(Adder1_out),
+	.src2_i(shl2_out),
 	.sum_o(Adder2_out)
 );
 
@@ -191,8 +218,8 @@ Data_Memory Data_Memory(
 MUX_4to1 #(.size(32)) Mux_MemToReg(
 	.data0_i(ALU_out_s4),
 	.data1_i(DM_out),
-	.data2_i(32'b0),
-	.data3_i(32'b0),
+	.data2_i(SE_out_s4),
+	.data3_i(Adder1_out_s4),
 	.select_i(MemToReg_s4),
 	.data_o(RDdata)
 );
@@ -256,20 +283,20 @@ Pipe_Reg #(.size(32 * 2)) reg193(
 	.data_o({ALU_out_s4, ALU_out_s5})
 );
 
-Pipe_Reg #(.size(32 * 3)) reg194(
+Pipe_Reg #(.size(32 * 4)) reg194(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({Adder1_out, Adder1_out_s2, Adder2_out}),
-	.data_o({Adder1_out_s2, Adder1_out_s3, Adder2_out_s4})
+	.data_i({Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder2_out}),
+	.data_o({Adder1_out_s2, Adder1_out_s3, Adder1_out_s4, Adder2_out_s4})
 );
 
-Pipe_Reg #(.size(32 * 2)) reg195(
+Pipe_Reg #(.size(32 * 3)) reg195(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({SE_out, DM_out}),
-	.data_o({SE_out_s3, DM_out_s5})
+	.data_i({SE_out, SE_out_s3, DM_out}),
+	.data_o({SE_out_s3, SE_out_s4, DM_out_s5})
 );
 
 Pipe_Reg #(.size(1 * 5)) reg210(

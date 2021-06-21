@@ -1,4 +1,4 @@
-all: run1
+all: run1 run2
 
 compile:
 	iverilog -o cpu ALU.v ALU_Ctrl.v Adder.v Data_Memory.v Decoder.v \
@@ -8,6 +8,10 @@ compile:
 
 run1:
 	cat testcase1.txt | tr -d ' ' | awk '/./' > testcase.txt
+	@make run
+
+run2:
+	cat testcase2.txt | tr -d ' ' | awk '/./' > testcase.txt
 	@make run
 
 run:
