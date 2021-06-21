@@ -18,7 +18,7 @@ always @(posedge clk_i) begin
 	if (~rst_i)
 		data_o <= 0;
 	else if (keep_i)
-		data_o <= keep_i;
+		data_o <= data_i;
 	else
 		data_o <= data_i;
 end

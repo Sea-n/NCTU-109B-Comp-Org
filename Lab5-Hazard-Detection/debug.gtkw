@@ -79,6 +79,24 @@ testbench.CPU.Forwarding.RegWrite_s5_i
 testbench.CPU.Forwarding.RDaddr_s5_i[4:0]
 @200
 -
+-Hazard
+@28
+testbench.CPU.Hazard.Stall_o
+@29
+testbench.CPU.Hazard.Branch_i
+@28
+testbench.CPU.Hazard.MemRead_i
+testbench.CPU.Hazard.MemRead_s3_i
+testbench.CPU.Hazard.MemRead_s4_i
+@22
+testbench.CPU.Hazard.RSaddr_i[4:0]
+testbench.CPU.Hazard.RTaddr_i[4:0]
+testbench.CPU.Hazard.RSaddr_s3_i[4:0]
+testbench.CPU.Hazard.RTaddr_s3_i[4:0]
+testbench.CPU.Hazard.RSaddr_s4_i[4:0]
+testbench.CPU.Hazard.RTaddr_s4_i[4:0]
+@200
+-
 -ALU Src
 @28
 testbench.CPU.Mux_ALUSrc0.select_i

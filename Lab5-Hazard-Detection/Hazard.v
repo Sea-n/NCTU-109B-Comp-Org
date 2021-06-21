@@ -5,22 +5,27 @@ module Hazard(
 	RTaddr_i,
 	RSaddr_s3_i,
 	RTaddr_s3_i,
+	RSaddr_s4_i,
+	RTaddr_s4_i,
 	Branch_i,
 	MemRead_i,
+	Branch_s3_i,
 	MemRead_s3_i,
+	MemRead_s4_i,
 	Stall_o,
 );
 
 // I/O ports
-input [4:0] RSaddr_i, RTaddr_i, RSaddr_s3_i, RTaddr_s3_i;
-input MemRead_i, MemRead_s3_i, Branch_i;
+input [4:0] RSaddr_i, RSaddr_s3_i, RSaddr_s4_i;
+input [4:0] RTaddr_i, RTaddr_s3_i, RTaddr_s4_i;
+input MemRead_i, MemRead_s3_i, MemRead_s4_i, Branch_i, Branch_s3_i;
 output wire Stall_o;
 
 // Main function
 assign Stall_o = (((RSaddr_i == RTaddr_s3_i) | (RTaddr_i == RTaddr_s3_i)) & MemRead_s3_i) |
 				 (((RSaddr_i == RSaddr_s3_i) | (RTaddr_i == RSaddr_s3_i)
 				 | (RSaddr_i == RTaddr_s3_i) | (RTaddr_i == RTaddr_s3_i)) & Branch_i) |
-				 (((RSaddr_i == RSaddr_s3_i) | (RTaddr_i == RSaddr_s3_i)
-				 | (RSaddr_i == RTaddr_s3_i) | (RTaddr_i == RTaddr_s3_i)) & MemRead_i & Branch_i);
+				 (((RSaddr_s3_i == RSaddr_s4_i) | (RTaddr_s3_i == RSaddr_s4_i)
+				 | (RSaddr_s3_i == RTaddr_s4_i) | (RTaddr_s3_i == RTaddr_s4_i)) & MemRead_s4_i & Branch_s3_i);
 
 endmodule

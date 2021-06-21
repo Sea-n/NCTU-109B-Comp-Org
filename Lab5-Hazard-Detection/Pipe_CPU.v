@@ -14,12 +14,12 @@ input clk_i, rst_i;
 // Internal signals
 wire ALU_zero, ALU_zero_s4, Branch_sel;
 wire [3:0] ALUCtrl;
-wire [4:0] RSaddr, RTaddr, RSaddr_s3, RTaddr_s3;
+wire [4:0] RSaddr, RTaddr, RSaddr_s3, RTaddr_s3, RSaddr_s4, RTaddr_s4;
 wire [4:0] RDaddr, RDaddr_s4, RDaddr_s5;
 
 wire [31:0] PC_in, PC_out, IM_out, IM_out_s2, IM_out_s3;
-wire [31:0] RDdata, RDdata_s5, RSdata, RSdata_s3, RTdata, RTdata_s3, RTdata_s4;
-wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_out, ALU_out_s4, ALU_out_s5;
+wire [31:0] RDdata, RDdata_s5, RSdata, RSdata_s3, RTdata, RTdata_s3;
+wire [31:0] ALU_src0, ALU_src1, ALU_src2, ALU_src2_s4, ALU_out, ALU_out_s4, ALU_out_s5;
 wire [31:0] Branch_out, shl1_out, shl2_out;
 wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder1_out_s4, Adder2_out, Adder2_out_s4;
 wire [31:0] SE_out, SE_out_s3, SE_out_s4, DM_out, DM_out_s5;
@@ -127,9 +127,13 @@ Hazard Hazard(
 	.RTaddr_i(RTaddr),
 	.RSaddr_s3_i(RSaddr_s3),
 	.RTaddr_s3_i(RTaddr_s3),
+	.RSaddr_s4_i(RSaddr_s4),
+	.RTaddr_s4_i(RTaddr_s4),
 	.Branch_i(Branch),
 	.MemRead_i(MemRead),
+	.Branch_s3_i(Branch_s3),
 	.MemRead_s3_i(MemRead_s3),
+	.MemRead_s4_i(MemRead_s4),
 	.Stall_o(Stall)
 );
 
@@ -149,13 +153,6 @@ ALU_Ctrl ALU_Ctrl(
 	.ALUCtrl_o(ALUCtrl)
 );
 
-MUX_2to1 #(.size(32)) Mux_ALUSrc0(
-	.data0_i(RTdata_s3),
-	.data1_i(SE_out_s3),
-	.select_i(ALUSrc_s3),
-	.data_o(ALU_src0)
-);
-
 MUX_4to1 #(.size(32)) Mux_ALUSrc1(
 	.data0_i(RSdata_s3),
 	.data1_i(RDdata_s5),
@@ -166,7 +163,7 @@ MUX_4to1 #(.size(32)) Mux_ALUSrc1(
 );
 
 MUX_4to1 #(.size(32)) Mux_ALUSrc2(
-	.data0_i(ALU_src0),
+	.data0_i(RTdata_s3),
 	.data1_i(RDdata_s5),
 	.data2_i(RDdata),
 	.data3_i(RDdata),
@@ -174,9 +171,16 @@ MUX_4to1 #(.size(32)) Mux_ALUSrc2(
 	.data_o(ALU_src2)
 );
 
+MUX_2to1 #(.size(32)) Mux_ALUSrc0(
+	.data0_i(ALU_src2),
+	.data1_i(SE_out_s3),
+	.select_i(ALUSrc_s3),
+	.data_o(ALU_src0)
+);
+
 ALU ALU(
 	.src1_i(ALU_src1),
-	.src2_i(ALU_src2),
+	.src2_i(ALU_src0),
 	.ctrl_i(ALUCtrl),
 	.result_o(ALU_out),
 	.zero_o(ALU_zero)
@@ -208,7 +212,7 @@ Forwarding Forwarding(
 Data_Memory Data_Memory(
 	.clk_i(clk_i),
 	.addr_i(ALU_out_s4),
-	.data_i(RTdata_s4),
+	.data_i(ALU_src2_s4),
 	.MemRead_i(MemRead_s4),
 	.MemWrite_i(MemWrite_s4),
 	.data_o(DM_out)
@@ -251,6 +255,14 @@ Pipe_Reg #(.size(5 * 2)) reg151(
 	.data_o({RSaddr_s3, RTaddr_s3})
 );
 
+Pipe_Reg #(.size(5 * 2)) reg152(
+	.clk_i(clk_i),
+	.rst_i(rst_i),
+	.keep_i(1'b0),
+	.data_i({RSaddr_s3, RTaddr_s3}),
+	.data_o({RSaddr_s4, RTaddr_s4})
+);
+
 Pipe_Reg #(.size(32)) reg190(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
@@ -267,20 +279,20 @@ Pipe_Reg #(.size(32)) reg191(
 	.data_o(IM_out_s3)
 );
 
-Pipe_Reg #(.size(32 * 4)) reg192(
+Pipe_Reg #(.size(32 * 3)) reg192(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({RSdata, RTdata, RTdata_s3, RDdata}),
-	.data_o({RSdata_s3, RTdata_s3, RTdata_s4, RDdata_s5})
+	.data_i({RSdata, RTdata, RDdata}),
+	.data_o({RSdata_s3, RTdata_s3, RDdata_s5})
 );
 
-Pipe_Reg #(.size(32 * 2)) reg193(
+Pipe_Reg #(.size(32 * 3)) reg193(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({ALU_out, ALU_out_s4}),
-	.data_o({ALU_out_s4, ALU_out_s5})
+	.data_i({ALU_out, ALU_out_s4, ALU_src2}),
+	.data_o({ALU_out_s4, ALU_out_s5, ALU_src2_s4})
 );
 
 Pipe_Reg #(.size(32 * 4)) reg194(
