@@ -156,8 +156,8 @@ Adder Adder2(
 );
 
 Forwarding Forwarding(
-	.RSaddr_i(RSaddr),
-	.RTaddr_i(RTaddr),
+	.RSaddr_i(RSaddr_s3),
+	.RTaddr_i(RTaddr_s3),
 	.RDaddr_s4_i(RDaddr_s4),
 	.RDaddr_s5_i(RDaddr_s5),
 	.RegWrite_s4_i(RegWrite_s4),
