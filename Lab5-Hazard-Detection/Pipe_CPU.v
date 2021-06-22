@@ -25,7 +25,7 @@ wire [31:0] Adder1_out, Adder1_out_s2, Adder1_out_s3, Adder1_out_s4, Adder2_out,
 wire [31:0] SE_out, SE_out_s3, SE_out_s4, DM_out, DM_out_s5;
 
 // Control signals
-wire ALUSrc, Branch, MemRead, MemWrite, RegWrite;
+wire ALUSrc, Branch, Flush, MemRead, MemWrite, RegWrite;
 wire ALUSrc_s2, Branch_s2, MemRead_s2, MemWrite_s2, RegWrite_s2;
 wire ALUSrc_s3, Branch_s3, MemRead_s3, MemWrite_s3, RegWrite_s3;
 wire Branch_s4, MemRead_s4, MemWrite_s4, RegWrite_s4, RegWrite_s5;
@@ -123,17 +123,18 @@ Decoder Decoder(
 	.RegDst_o(RegDst)
 );
 
+assign Flush = Branch_s3 & Branch_sel & (Jump == 2'b01);
 MUX_2to1 #(.size(5 * 1)) Mux_Decoder1(
 	.data0_i({ALUSrc, Branch, MemRead, MemWrite, RegWrite}),
 	.data1_i(5'b0),
-	.select_i(Stall),
+	.select_i(Stall | Flush),
 	.data_o({ALUSrc_s2, Branch_s2, MemRead_s2, MemWrite_s2, RegWrite_s2})
 );
 
 MUX_2to1 #(.size(5 * 2)) Mux_Decoder2(
 	.data0_i({ALUOp, BranchType, Jump, MemToReg, RegDst}),
 	.data1_i(10'b0),
-	.select_i(Stall),
+	.select_i(Stall | Flush),
 	.data_o({ALUOp_s2, BranchType_s2, Jump_s2, MemToReg_s2, RegDst_s2})
 );
 
@@ -207,7 +208,7 @@ Shift_Left_Two_32 Shifter2(
 );
 
 Adder Adder2(
-	.src1_i(Adder1_out),
+	.src1_i(PC_out),
 	.src2_i(shl2_out),
 	.sum_o(Adder2_out)
 );
