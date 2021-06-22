@@ -4,7 +4,6 @@ module Decoder(
 	clk_i,
 	instr_op_i,
 	function_i,
-	Stall_i,
 	ALUOp_o,
 	ALUSrc_o,
 	Branch_o,
@@ -18,32 +17,22 @@ module Decoder(
 );
 
 // I/O ports
-input clk_i, Stall_i;
+input clk_i;
 input [6-1:0] instr_op_i, function_i;
 output reg [2-1:0] ALUOp_o, BranchType_o, Jump_o, MemToReg_o, RegDst_o;
 output reg ALUSrc_o, Branch_o, MemRead_o, MemWrite_o, RegWrite_o;
 
 // Main function
 always @(instr_op_i) begin
-	if (Stall_i) begin
-		Branch_o     <= 1'b0;
-		BranchType_o <= 2'b0;
-	end else begin
-		Branch_o     <=  instr_op_i[5:1] == 5'b00010 || instr_op_i == 6'b000001 || instr_op_i == 6'b000111;
-		BranchType_o <=  instr_op_i[5:1] == 5'b00010
-			? (instr_op_i[0] ? 2'b11 : 2'b00)   // bne / beq
-			: (instr_op_i[1] ? 2'b01 : 2'b10);  // bgtz / bgez
-	end
+	Branch_o     <= instr_op_i[5:1] == 5'b00010 || instr_op_i == 6'b000001 || instr_op_i == 6'b000111;
+	BranchType_o <= instr_op_i[5:1] == 5'b00010
+		? (instr_op_i[0] ? 2'b11 : 2'b00)   // bne / beq
+		: (instr_op_i[1] ? 2'b01 : 2'b10);  // bgtz / bgez
 end
 
 always @(instr_op_i) begin
-	if (Stall_i) begin
-		MemRead_o    <= 1'b0;
-		MemWrite_o   <= 1'b0;
-	end else begin
-		MemRead_o    <=  instr_op_i == 6'b100011;  // lw
-		MemWrite_o   <=  instr_op_i == 6'b101011;  // sw
-	end
+	MemRead_o  <= instr_op_i == 6'b100011;  // lw
+	MemWrite_o <= instr_op_i == 6'b101011;  // sw
 end
 
 always @(instr_op_i) begin
@@ -94,15 +83,12 @@ always @(instr_op_i) begin
 end
 
 always @(instr_op_i) begin
-	if (Stall_i)
-		RegWrite_o <= 0;
-	else
-		casez (instr_op_i)
-			6'b000000: RegWrite_o <= 1;  // add
-			6'b0010??: RegWrite_o <= 1;  // addi / addiu / slti / sltiu
-			6'b?00011: RegWrite_o <= 1;  // jal / lw
-			default:   RegWrite_o <= 0;
-		endcase
+	casez (instr_op_i)
+		6'b000000: RegWrite_o <= 1;  // add
+		6'b0010??: RegWrite_o <= 1;  // addi / addiu / slti / sltiu
+		6'b?00011: RegWrite_o <= 1;  // jal / lw
+		default:   RegWrite_o <= 0;
+	endcase
 end
 
 endmodule

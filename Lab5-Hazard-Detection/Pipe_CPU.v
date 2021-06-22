@@ -26,9 +26,11 @@ wire [31:0] SE_out, SE_out_s3, SE_out_s4, DM_out, DM_out_s5;
 
 // Control signals
 wire ALUSrc, Branch, MemRead, MemWrite, RegWrite;
+wire ALUSrc_s2, Branch_s2, MemRead_s2, MemWrite_s2, RegWrite_s2;
 wire ALUSrc_s3, Branch_s3, MemRead_s3, MemWrite_s3, RegWrite_s3;
 wire Branch_s4, MemRead_s4, MemWrite_s4, RegWrite_s4, RegWrite_s5;
 wire [1:0] ALUOp, BranchType, Jump, MemToReg, RegDst;
+wire [1:0] ALUOp_s2, BranchType_s2, Jump_s2, MemToReg_s2, RegDst_s2;
 wire [1:0] ALUOp_s3, MemToReg_s3, RegDst_s3;
 wire [1:0] MemToReg_s4, MemToReg_s5;
 
@@ -109,7 +111,6 @@ Decoder Decoder(
 	.clk_i(clk_i),
 	.instr_op_i(IM_out_s2[31:26]),
 	.function_i(IM_out_s2[5:0]),
-	.Stall_i(Stall),
 	.ALUOp_o(ALUOp),
 	.ALUSrc_o(ALUSrc),
 	.Branch_o(Branch),
@@ -120,6 +121,20 @@ Decoder Decoder(
 	.MemWrite_o(MemWrite),
 	.RegWrite_o(RegWrite),
 	.RegDst_o(RegDst)
+);
+
+MUX_2to1 #(.size(5 * 1)) Mux_Decoder1(
+	.data0_i({ALUSrc, Branch, MemRead, MemWrite, RegWrite}),
+	.data1_i(5'b0),
+	.select_i(Stall),
+	.data_o({ALUSrc_s2, Branch_s2, MemRead_s2, MemWrite_s2, RegWrite_s2})
+);
+
+MUX_2to1 #(.size(5 * 2)) Mux_Decoder2(
+	.data0_i({ALUOp, BranchType, Jump, MemToReg, RegDst}),
+	.data1_i(10'b0),
+	.select_i(Stall),
+	.data_o({ALUOp_s2, BranchType_s2, Jump_s2, MemToReg_s2, RegDst_s2})
 );
 
 Hazard Hazard(
@@ -315,7 +330,7 @@ Pipe_Reg #(.size(1 * 5)) reg210(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({ALUSrc, Branch, MemRead, MemWrite, RegWrite}),
+	.data_i({ALUSrc_s2, Branch_s2, MemRead_s2, MemWrite_s2, RegWrite_s2}),
 	.data_o({ALUSrc_s3, Branch_s3, MemRead_s3, MemWrite_s3, RegWrite_s3})
 );
 
@@ -331,7 +346,7 @@ Pipe_Reg #(.size(2 * 3)) reg220(
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 	.keep_i(1'b0),
-	.data_i({ALUOp, MemToReg, RegDst}),
+	.data_i({ALUOp_s2, MemToReg_s2, RegDst_s2}),
 	.data_o({ALUOp_s3, MemToReg_s3, RegDst_s3})
 );
 

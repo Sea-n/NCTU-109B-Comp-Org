@@ -15,7 +15,7 @@
 [sst_width] 193
 [signals_width] 250
 [sst_expanded] 1
-[sst_vpaned_height] 335
+[sst_vpaned_height] 500
 @28
 testbench.clk
 @22
