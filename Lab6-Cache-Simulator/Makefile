@@ -5,3 +5,4 @@ compile:
 
 run:
 	./cache_simulator -f Trace1.txt -c 1 -b 32 -a 2
+	./cache_simulator -f Trace.txt -c 8 -b 32 -a 2 -d 3
