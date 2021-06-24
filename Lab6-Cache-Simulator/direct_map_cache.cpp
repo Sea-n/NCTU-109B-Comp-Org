@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <cgetopt>
+#include <getopt.h>
 
 using namespace std;
 
@@ -13,7 +13,36 @@ struct cache_content {
 
 const int K = 1024;
 
-void simulate(int cache_size, int block_size, int asso, string& test_file_name){
+void simulate(const int cache_size, const int block_size, const int asso, const string& test_file_name);
+
+int main(const int argc, char** argv) {
+	string test_file_name;
+	int cache_size = 4;
+	int block_size = 16;
+	int associativity = 1;
+	int current_option;
+	while ((current_option = getopt(argc, argv, "f:c:b:a:")) != EOF) {
+		switch (current_option) {
+			case 'f':
+				test_file_name = string(optarg);
+				break;
+			case 'c':
+				cache_size = atoi(optarg);
+				break;
+			case 'b':
+				block_size = atoi(optarg);
+				break;
+			case 'a':
+				associativity = atoi(optarg);
+				break;
+		}
+	}
+
+	// default simulate 4KB direct map cache with 16B blocks
+	simulate(cache_size*K, block_size, associativity, test_file_name);
+}
+
+void simulate(const int cache_size, const int block_size, const int asso, const string& test_file_name){
 	FILE *fp = fopen(test_file_name.c_str(), "r");  // read file
 
 	if (!fp) {
@@ -48,31 +77,4 @@ void simulate(int cache_size, int block_size, int asso, string& test_file_name){
 	fclose(fp);
 
 	delete[] cache;
-}
-
-int main(int argc, char** argv) {
-	string test_file_name;
-	int cache_size = 4;
-	int block_size = 16;
-	int associativity = 1;
-	int current_option;
-	while ((current_option = getopt(argc, argv, "f:c:b:a:")) != EOF) {
-		switch (current_option) {
-			case 'f':
-				test_file_name = string(optarg);
-				break;
-			case 'c':
-				cache_size = atoi(optarg);
-				break;
-			case 'b':
-				block_size = atoi(optarg);
-				break;
-			case 'a':
-				associativity = atoi(optarg);
-				break;
-		}
-	}
-
-	// default simulate 4KB direct map cache with 16B blocks
-	simulate(cache_size*K, block_size, associativity, test_file_name);
 }
