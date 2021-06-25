@@ -1,65 +1,62 @@
 #include <iostream>
+#include <getopt.h>
 #include <sstream>
 #include <string>
 #include <cmath>
-#include <getopt.h>
+
+#define K 1024
 
 using namespace std;
 
-struct cache_content {
-	bool v;
-	unsigned int tag;
-	unsigned ts;
-	// unsigned int data[16];
-};
-
-const int K = 1024;
-
-void simulate(const int cache_size, const int block_size, const unsigned assoc, const string& testcase, const int dot);
+void simulate(const int cache_size, const int block_size, const unsigned assoc, const string& testcase, const int prec);
 
 int main(const int argc, char** argv) {
 	int block_size = 16;
-	int current_option;
 	int cache_size = 4;
 	unsigned assoc = 1;
 	string testcase;
-	int dot = -1;
-	while ((current_option = getopt(argc, argv, "f:d:c:b:a:")) != EOF) {
-		switch (current_option) {
-			case 'f':
-				testcase = string(optarg);
-				break;
-			case 'd':
-				dot = atoi(optarg);
-				break;
-			case 'c':
-				cache_size = atoi(optarg);
+	int prec = -1;
+	int opt;
+	while ((opt = getopt(argc, argv, "a:b:c:f:p:")) != EOF) {
+		switch (opt) {
+			case 'a':
+				assoc = (unsigned) atoi(optarg);
 				break;
 			case 'b':
 				block_size = atoi(optarg);
 				break;
-			case 'a':
-				assoc = (unsigned) atoi(optarg);
+			case 'c':
+				cache_size = atoi(optarg);
+				break;
+			case 'f':
+				testcase = string(optarg);
+				break;
+			case 'p':
+				prec = atoi(optarg);
 				break;
 		}
 	}
 
-	// default simulate 4KB direct map cache with 16B blocks
-	simulate(cache_size*K, block_size, assoc, testcase, dot);
+	simulate(cache_size*K, block_size, assoc, testcase, prec);
 }
 
-void simulate(const int cache_size, const int block_size, const unsigned assoc, const string& testcase, const int dot) {
+struct cache_content {
+	bool v;
+	unsigned int tag, ts;
+};
+
+void simulate(const int cache_size, const int block_size, const unsigned assoc, const string& testcase, const int prec) {
 	unsigned tag, base, x, k, old, cnt=0, cnt0=0;
+	const int offset_bit = (int) log2(block_size);
+	const int cache_bit = (int) log2(cache_size);
+	const int index_bit = cache_bit - offset_bit;
+	const int line = cache_size >> offset_bit;
+	const int assoc_bit = (int) log2(assoc);
 	FILE *fp = fopen(testcase.c_str(), "r");
-	int offset_bit = (int) log2(block_size);
-	int cache_bit = (int) log2(cache_size);
-	int index_bit = cache_bit - offset_bit;
-	int line = cache_size >> offset_bit;
-	int assoc_bit = (int) log2(assoc);
 	stringstream ss1, ss0;
 
 	if (!fp) {
-		cerr << "Test file doesn't exist\n";
+		cerr << "Test file '" << testcase << "' doesn't exist\n";
 		return;
 	}
 
@@ -107,13 +104,13 @@ void simulate(const int cache_size, const int block_size, const unsigned assoc, 
 	ss0.seekp(0, ss0.beg);  ss0 << ':';
 	ss1.seekp(0, ss0.beg);  ss1 << ':';
 
-	if (dot == -1) {
+	if (prec == -1) {
 		cout << "Miss rate: " << (cnt0 * 100 / cnt) << "%\n";
 		cout << "Hits instructions" << ss1.str() << '\n';
 		cout << "Misses instructions" << ss0.str() << '\n';
 	} else {
 		double ans = cnt0 * 100 / (double) cnt;
-		cout.precision(dot);
+		cout.precision(prec);
 		cout << ans << '\n';
 	}
 
