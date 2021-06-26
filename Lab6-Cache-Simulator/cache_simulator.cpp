@@ -71,8 +71,8 @@ void simulate(const int cache_size, const int block_size, const unsigned assoc, 
 
 		for (k=0; k<assoc; k++) {
 			if (cache[base | k].v && cache[base | k].tag == tag) {
-				cache[base | k].ts = cnt;
-				ss1 << ", " << ++cnt;
+				cache[base | k].ts = ++cnt;
+				ss1 << ", " << cnt;
 				break;
 			}
 		}
